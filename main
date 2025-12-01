@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>表面能计算工具（基于接触角）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      color-scheme: light dark;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    h1, h2 {
+      margin: 0 0 12px;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 4px 0 8px;
+      line-height: 1.4;
+      font-size: 14px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+
+    label {
+      font-size: 13px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px 10px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: 1px solid #cccccc;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      background: #ffffff;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 1px rgba(37,99,235,0.3);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px 12px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: none;
+      background: #2563eb;
+      color: #ffffff;
+      font-size: 14px;
+      cursor: pointer;
+      gap: 6px;
+      transition: background 0.15s ease, transform 0.05s ease;
+      margin-right: 8px;
+      white-space: nowrap;
+    }
+
+    .btn.secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .btn.danger {
+      background: #ef4444;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      border-collapse: collapse;
+      min-width: 720px;
+      width: 100%;
+      font-size: 13px;
+    }
+
+    th, td {
+      padding: 6px 8px;
+      text-align: center;
+      border-bottom: 1px solid #e5e7eb;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f3f4f6;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 11px;
+      background: #eef2ff;
+      color: #3730a3;
+      margin-left: 4px;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .error {
+      color: #b91c1c;
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+      h1 {
+        font-size: 20px;
+      }
+      h2 {
+        font-size: 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      .card {
+        padding: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>表面能计算工具 <span class="tag">基于接触角 · Owens-Wendt</span></h1>
+
+    <!-- 液体参数配置 -->
+    <div class="card">
+      <h2>1. 液体参数设置</h2>
+      <p class="hint">
+        通常只需要设置一次。默认给出「水」和「二碘甲烷」两种探针液的参数，
+        你也可以根据实验需要自行修改。单位可统一使用 mN/m。
+      </p>
+      <div class="table-wrapper">
+        <table id="liquids-table">
+          <thead>
+            <tr>
+              <th>液体名称</th>
+              <th>SToverall<br><span class="hint">总表面张力</span></th>
+              <th>Disp<br><span class="hint">色散分量</span></th>
+              <th>Polar<br><span class="hint">极性分量</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <input type="text" value="水" />
+              </td>
+              <td>
+                <input type="number" step="0.001" value="72.8" />
+              </td>
+              <td>
+                <input type="number" step="0.001" value="21.8" />
+              </td>
+              <td>
+                <input type="number" step="0.001" value="51.0" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input type="text" value="二碘甲烷" />
+              </td>
+              <td>
+                <input type="number" step="0.001" value="50.8" />
+              </td>
+              <td>
+                <input type="number" step="0.001" value="50.8" />
+              </td>
+              <td>
+                <input type="number" step="0.001" value="0" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="hint" style="margin-top:8px;">
+        提示：若使用不同探针液，只要修改此处 ST / Disp / Polar，即可复用下面的样品输入与计算逻辑。
+      </p>
+    </div>
+
+    <!-- 样品输入 -->
+    <div class="card">
+      <h2>2. 样品接触角输入</h2>
+      <p class="hint">
+        每个样品一行，输入该样品在两种液体下的接触角（单位：度）。
+        计算程序会自动将角度转为 cos(θ)，并使用你的液体参数做线性拟合。
+      </p>
+
+      <div style="margin-bottom: 8px;">
+        <button class="btn" type="button" id="add-sample-btn">＋ 添加样品</button>
+        <button class="btn secondary" type="button" id="clear-samples-btn">清空样品</button>
+      </div>
+
+      <div class="table-wrapper">
+        <table id="samples-table">
+          <thead>
+            <tr>
+              <th>样品名</th>
+              <th>水接触角 (°)</th>
+              <th>二碘甲烷接触角 (°)</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="samples-body">
+            <!-- 初始一行样品 -->
+            <tr>
+              <td>
+                <input type="text" placeholder="例如：Sample 1" />
+              </td>
+              <td>
+                <input type="number" step="0.1" placeholder="例如：90" />
+              </td>
+              <td>
+                <input type="number" step="0.1" placeholder="例如：60" />
+              </td>
+              <td>
+                <button class="btn danger" type="button" onclick="removeSampleRow(this)">删除</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top: 12px;">
+        <button class="btn" type="button" id="calc-btn">计算表面能与黏附功</button>
+        <span class="hint">点击后立即在下方表格中显示结果。</span>
+        <div id="error-message" class="error"></div>
+      </div>
+    </div>
+
+    <!-- 结果展示 -->
+    <div class="card">
+      <h2>3. 计算结果</h2>
+      <p class="hint">
+        结果对应你原 Matlab 程序中导出的表格：样品名、水/二碘甲烷接触角与黏附功、总表面能以及极性/色散分量。
+      </p>
+      <div class="table-wrapper">
+        <table id="result-table">
+          <thead>
+            <tr>
+              <th>样品名</th>
+              <th>水接触角 (°)</th>
+              <th>水黏附功</th>
+              <th>二碘甲烷接触角 (°)</th>
+              <th>二碘甲烷黏附功</th>
+              <th>总的表面能</th>
+              <th>表面能的极性分量</th>
+              <th>表面能的色散分量</th>
+            </tr>
+          </thead>
+          <tbody id="result-body">
+            <!-- 结果行由脚本插入 -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 工具函数：线性拟合 y = m*x + b
+    function linearFit(x, y) {
+      const n = x.length;
+      if (n !== y.length || n < 2) {
+        throw new Error("线性拟合至少需要 2 个点，并且 x / y 数量需一致。");
+      }
+      let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+      for (let i = 0; i < n; i++) {
+        sumX += x[i];
+        sumY += y[i];
+        sumXY += x[i] * y[i];
+        sumXX += x[i] * x[i];
+      }
+      const meanX = sumX / n;
+      const meanY = sumY / n;
+
+      const Sxy = sumXY - n * meanX * meanY;
+      const Sxx = sumXX - n * meanX * meanX;
+
+      const m = Sxx === 0 ? 0 : Sxy / Sxx;
+      const b = meanY - m * meanX;
+      return { m, b };
+    }
+
+    function formatNumber(value, decimals = 3) {
+      if (typeof value !== "number" || !isFinite(value)) return "";
+      return value.toFixed(decimals);
+    }
+
+    // 读取液体参数（默认取前两个液体，对应水和二碘甲烷）
+    function getLiquidParams() {
+      const rows = document.querySelectorAll("#liquids-table tbody tr");
+      if (rows.length < 2) {
+        throw new Error("请至少设置两种液体参数。");
+      }
+      const liquids = [];
+      rows.forEach((row) => {
+        const inputs = row.querySelectorAll("input");
+        const name = inputs[0].value.trim() || "液体";
+        const ST = parseFloat(inputs[1].value);
+        const disp = parseFloat(inputs[2].value);
+        const polar = parseFloat(inputs[3].value);
+        if (isNaN(ST) || isNaN(disp) || isNaN(polar)) {
+          throw new Error("液体参数中存在非数值，请检查。");
+        }
+        liquids.push({ name, ST, disp, polar });
+      });
+      // 只使用前两个液体，保持与原 Matlab 程序结构一致
+      return liquids.slice(0, 2);
+    }
+
+    // 计算主逻辑
+    function calculate() {
+      const errorBox = document.getElementById("error-message");
+      errorBox.textContent = "";
+      const resultBody = document.getElementById("result-body");
+      resultBody.innerHTML = "";
+
+      let liquids;
+      try {
+        liquids = getLiquidParams(); // [{name, ST, disp, polar}, ...]
+      } catch (err) {
+        errorBox.textContent = err.message;
+        return;
+      }
+
+      const sampleRows = document.querySelectorAll("#samples-body tr");
+      if (sampleRows.length === 0) {
+        errorBox.textContent = "请至少添加一行样品数据。";
+        return;
+      }
+
+      sampleRows.forEach((row) => {
+        const inputs = row.querySelectorAll("input");
+        const sampleName = inputs[0].value.trim() || "未命名样品";
+        const waterAngleDeg = parseFloat(inputs[1].value);
+        const dimAngleDeg = parseFloat(inputs[2].value);
+
+        if (isNaN(waterAngleDeg) || isNaN(dimAngleDeg)) {
+          // 如果该行角度没填完整，跳过该样品，但不报错
+          return;
+        }
+
+        // 将角度 (°) 转为 cos(θ)
+        const thetaRadWater = (waterAngleDeg * Math.PI) / 180;
+        const thetaRadDim = (dimAngleDeg * Math.PI) / 180;
+        const cosWater = Math.cos(thetaRadWater);
+        const cosDim = Math.cos(thetaRadDim);
+
+        const x = [];
+        const y = [];
+
+        // 对应液体 1（默认水）
+        const L1 = liquids[0];
+        x.push(Math.sqrt(L1.polar) / Math.sqrt(L1.disp));
+        y.push(
+          (L1.ST * (cosWater + 1)) /
+            (2 * Math.sqrt(L1.disp))
+        );
+
+        // 对应液体 2（默认二碘甲烷）
+        const L2 = liquids[1];
+        x.push(Math.sqrt(L2.polar) / Math.sqrt(L2.disp));
+        y.push(
+          (L2.ST * (cosDim + 1)) /
+            (2 * Math.sqrt(L2.disp))
+        );
+
+        // 线性拟合
+        const { m, b } = linearFit(x, y);
+
+        // 表面能分量 & 黏附功（与 Matlab 程序一致）
+        const surfaceEnergyPolar = m * m;
+        const surfaceEnergyDispersive = b * b;
+        const totalSurfaceEnergy = surfaceEnergyPolar + surfaceEnergyDispersive;
+
+        const waterAdhesion = L1.ST * (1 + cosWater);
+        const dimAdhesion = L2.ST * (1 + cosDim);
+
+        // 插入结果行
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${sampleName}</td>
+          <td>${formatNumber(waterAngleDeg, 1)}</td>
+          <td>${formatNumber(waterAdhesion)}</td>
+          <td>${formatNumber(dimAngleDeg, 1)}</td>
+          <td>${formatNumber(dimAdhesion)}</td>
+          <td>${formatNumber(totalSurfaceEnergy)}</td>
+          <td>${formatNumber(surfaceEnergyPolar)}</td>
+          <td>${formatNumber(surfaceEnergyDispersive)}</td>
+        `;
+        resultBody.appendChild(tr);
+      });
+
+      if (!resultBody.hasChildNodes()) {
+        errorBox.textContent = "没有有效的样品数据，请确认每行的接触角已填写为数值。";
+      }
+    }
+
+    // 删除样品行
+    function removeSampleRow(btn) {
+      const tbody = document.getElementById("samples-body");
+      if (tbody.rows.length <= 1) {
+        // 保证至少保留一行，避免用户删空后忘记添加
+        tbody.rows[0].querySelectorAll("input").forEach((inp) => (inp.value = ""));
+        return;
+      }
+      const tr = btn.closest("tr");
+      tbody.removeChild(tr);
+    }
+
+    // 添加样品行
+    function addSampleRow() {
+      const tbody = document.getElementById("samples-body");
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>
+          <input type="text" placeholder="例如：Sample ${tbody.rows.length + 1}" />
+        </td>
+        <td>
+          <input type="number" step="0.1" placeholder="例如：90" />
+        </td>
+        <td>
+          <input type="number" step="0.1" placeholder="例如：60" />
+        </td>
+        <td>
+          <button class="btn danger" type="button" onclick="removeSampleRow(this)">删除</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    // 清空样品
+    function clearSamples() {
+      const tbody = document.getElementById("samples-body");
+      tbody.innerHTML = "";
+    }
+
+    // 挂载事件
+    document.getElementById("add-sample-btn").addEventListener("click", addSampleRow);
+    document.getElementById("clear-samples-btn").addEventListener("click", clearSamples);
+    document.getElementById("calc-btn").addEventListener("click", calculate);
+
+    // 将删除方法挂到全局，供行内 onclick 使用
+    window.removeSampleRow = removeSampleRow;
+  </script>
+</body>
+</html>
