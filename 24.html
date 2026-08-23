@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#f6f7fb">
+<title>24点计算器</title>
+<style>
+  :root{
+    --bg:#f6f7fb;
+    --card:#ffffff;
+    --text:#1f2430;
+    --muted:#6b7280;
+    --border:#e5e7eb;
+    --primary:#2563eb;
+    --primary-hover:#1d4ed8;
+    --success:#16a34a;
+    --danger:#dc2626;
+    --shadow:0 10px 30px rgba(15,23,42,.08);
+    --radius:18px;
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    min-height:100vh;
+    background:linear-gradient(180deg,#f8faff 0%,var(--bg) 100%);
+    color:var(--text);
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",
+      "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  }
+
+  .page{
+    width:min(1100px, calc(100% - 32px));
+    margin:0 auto;
+    padding:40px 0 56px;
+  }
+
+  .hero{
+    margin-bottom:20px;
+  }
+  .hero h1{
+    margin:0;
+    font-size:clamp(30px,5vw,48px);
+    line-height:1.12;
+    letter-spacing:-.03em;
+  }
+  .hero p{
+    margin:10px 0 0;
+    color:var(--muted);
+    font-size:15px;
+    line-height:1.7;
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid rgba(229,231,235,.9);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+  }
+
+  .input-card{
+    padding:24px;
+  }
+
+  .section-title{
+    margin:0 0 8px;
+    font-size:18px;
+  }
+
+  .hint{
+    margin:0 0 18px;
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.6;
+  }
+
+  .inputs{
+    display:grid;
+    grid-template-columns:repeat(4, minmax(0,1fr));
+    gap:12px;
+  }
+
+  .num-input{
+    width:100%;
+    height:58px;
+    border:1px solid var(--border);
+    border-radius:14px;
+    background:#fbfcff;
+    text-align:center;
+    font-size:24px;
+    font-weight:700;
+    color:var(--text);
+    outline:none;
+    transition:.2s ease;
+    -webkit-appearance:none;
+  }
+  .num-input:focus{
+    border-color:var(--primary);
+    box-shadow:0 0 0 4px rgba(37,99,235,.12);
+    background:#fff;
+  }
+
+  .actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:16px;
+  }
+
+  button{
+    border:0;
+    border-radius:12px;
+    padding:12px 18px;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.18s ease;
+    min-height:44px;
+  }
+  .btn-primary{
+    color:#fff;
+    background:var(--primary);
+  }
+  .btn-primary:hover{background:var(--primary-hover)}
+  .btn-secondary{
+    color:#374151;
+    background:#eef0f4;
+  }
+  .btn-secondary:hover{background:#e5e7eb}
+
+  .examples{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:14px;
+  }
+  .example{
+    padding:8px 11px;
+    border-radius:999px;
+    background:#f3f4f6;
+    color:#4b5563;
+    font-size:13px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .example:hover{background:#e5e7eb}
+
+  .error{
+    display:none;
+    margin-top:14px;
+    padding:11px 13px;
+    border-radius:12px;
+    background:#fef2f2;
+    color:#b91c1c;
+    font-size:14px;
+    line-height:1.5;
+  }
+
+  .result-card{
+    margin-top:20px;
+    overflow:hidden;
+  }
+
+  .result-head{
+    padding:20px 24px 18px;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:16px;
+  }
+
+  .result-title{
+    margin:0;
+    font-size:20px;
+  }
+  .summary{
+    margin-top:7px;
+    color:var(--muted);
+    font-size:14px;
+  }
+
+  .badge{
+    flex:0 0 auto;
+    display:inline-flex;
+    align-items:center;
+    padding:7px 11px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:700;
+  }
+  .badge.success{background:#ecfdf3;color:#15803d}
+  .badge.danger{background:#fef2f2;color:#b91c1c}
+
+  .result-body{
+    padding:20px 24px 24px;
+  }
+
+  .status-empty{
+    color:var(--muted);
+    text-align:center;
+    padding:34px 12px;
+    line-height:1.7;
+  }
+
+  .solutions-toolbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    margin-bottom:14px;
+    flex-wrap:wrap;
+  }
+
+  .count{
+    font-size:14px;
+    color:var(--muted);
+  }
+
+  .solution-list{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0,1fr));
+    gap:10px;
+    max-height:560px;
+    overflow:auto;
+    padding-right:2px;
+  }
+
+  .solution{
+    border:1px solid var(--border);
+    border-radius:12px;
+    background:#fbfcff;
+    padding:12px 14px;
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+    font-size:15px;
+    line-height:1.6;
+    word-break:break-word;
+  }
+
+  .solution-number{
+    color:#9ca3af;
+    margin-right:8px;
+    user-select:none;
+  }
+
+  .footer-note{
+    margin-top:16px;
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.7;
+  }
+
+  .loading{
+    display:none;
+    margin:8px 0 0;
+    color:var(--primary);
+    font-size:14px;
+  }
+
+  @media (max-width: 720px){
+    .page{
+      width:min(100% - 20px, 680px);
+      padding:20px 0 30px;
+    }
+    .input-card{padding:18px}
+    .inputs{
+      grid-template-columns:repeat(2, minmax(0,1fr));
+    }
+    .num-input{
+      height:56px;
+      font-size:22px;
+    }
+    .result-head{
+      padding:18px;
+    }
+    .result-body{
+      padding:18px;
+    }
+    .solution-list{
+      grid-template-columns:1fr;
+      max-height:60vh;
+    }
+  }
+
+  @media (max-width: 380px){
+    .page{width:calc(100% - 14px)}
+    .inputs{gap:9px}
+    .actions button{width:100%}
+    .hero p{font-size:14px}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="hero">
+    <h1>24点计算器</h1>
+    <p>输入任意四个 1～13 的整数，允许数字重复。程序会穷举 +、−、×、÷ 及括号，并精确判断结果是否等于 24。</p>
+  </header>
+
+  <section class="card input-card">
+    <h2 class="section-title">输入四个数字</h2>
+    <p class="hint">例如：1、3、4、6。可以输入相同数字；中间过程允许出现分数，但最终必须精确等于 24。</p>
+
+    <div class="inputs">
+      <input class="num-input" id="n1" type="number" min="1" max="13" inputmode="numeric" placeholder="数字 1" aria-label="数字1">
+      <input class="num-input" id="n2" type="number" min="1" max="13" inputmode="numeric" placeholder="数字 2" aria-label="数字2">
+      <input class="num-input" id="n3" type="number" min="1" max="13" inputmode="numeric" placeholder="数字 3" aria-label="数字3">
+      <input class="num-input" id="n4" type="number" min="1" max="13" inputmode="numeric" placeholder="数字 4" aria-label="数字4">
+    </div>
+
+    <div class="actions">
+      <button class="btn-primary" id="calcBtn">计算 24 点</button>
+      <button class="btn-secondary" id="clearBtn">清空</button>
+    </div>
+
+    <div class="examples">
+      <span class="example" data-values="1,3,4,6">1 3 4 6</span>
+      <span class="example" data-values="5,5,5,1">5 5 5 1</span>
+      <span class="example" data-values="1,1,1,1">1 1 1 1</span>
+      <span class="example" data-values="1,2,8,11">1 2 8 11</span>
+    </div>
+
+    <div class="error" id="error"></div>
+    <div class="loading" id="loading">正在穷举……</div>
+  </section>
+
+  <section class="card result-card">
+    <div class="result-head">
+      <div>
+        <h2 class="result-title" id="resultTitle">等待计算</h2>
+        <div class="summary" id="summary">输入四个数字后点击“计算 24 点”。</div>
+      </div>
+      <span class="badge" id="badge" style="display:none"></span>
+    </div>
+
+    <div class="result-body">
+      <div class="status-empty" id="emptyState">
+        支持 PC、平板和手机浏览器。结果会显示所有不同的解法。
+      </div>
+
+      <div id="resultContent" style="display:none">
+        <div class="solutions-toolbar">
+          <div class="count" id="countText"></div>
+          <button class="btn-secondary" id="copyBtn" style="display:none">复制全部解法</button>
+        </div>
+        <div class="solution-list" id="solutionList"></div>
+        <div class="footer-note" id="footerNote"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+"use strict";
+
+/*
+ * 精确分数：
+ * 用 BigInt 保存分子/分母，避免 JavaScript 浮点数误差。
+ */
+class Fraction {
+  constructor(n, d = 1n) {
+    n = BigInt(n);
+    d = BigInt(d);
+    if (d === 0n) throw new Error("分母不能为0");
+
+    if (d < 0n) {
+      n = -n;
+      d = -d;
+    }
+
+    const g = Fraction.gcd(n < 0n ? -n : n, d);
+    this.n = n / g;
+    this.d = d / g;
+  }
+
+  static gcd(a, b) {
+    while (b !== 0n) {
+      const t = a % b;
+      a = b;
+      b = t;
+    }
+    return a;
+  }
+
+  add(o) { return new Fraction(this.n * o.d + o.n * this.d, this.d * o.d); }
+  sub(o) { return new Fraction(this.n * o.d - o.n * this.d, this.d * o.d); }
+  mul(o) { return new Fraction(this.n * o.n, this.d * o.d); }
+
+  div(o) {
+    if (o.n === 0n) return null;
+    return new Fraction(this.n * o.d, this.d * o.n);
+  }
+
+  equalsInt(x) {
+    return this.d === 1n && this.n === BigInt(x);
+  }
+
+  key() {
+    return `${this.n}/${this.d}`;
+  }
+}
+
+/*
+ * 表达式节点：
+ * { value: Fraction, expr: string }
+ */
+function findAllSolutions(nums) {
+  const solutions = new Set();
+
+  function dfs(items) {
+    if (items.length === 1) {
+      if (items[0].value.equalsInt(24)) {
+        solutions.add(items[0].expr);
+      }
+      return;
+    }
+
+    for (let i = 0; i < items.length; i++) {
+      for (let j = i + 1; j < items.length; j++) {
+        const a = items[i];
+        const b = items[j];
+
+        const rest = [];
+        for (let k = 0; k < items.length; k++) {
+          if (k !== i && k !== j) rest.push(items[k]);
+        }
+
+        /*
+         * 加法和乘法是交换律运算。
+         * 为减少无意义重复，只保留一个方向。
+         */
+        const candidates = [];
+
+        candidates.push({
+          value: a.value.add(b.value),
+          expr: `(${a.expr}+${b.expr})`
+        });
+
+        candidates.push({
+          value: a.value.mul(b.value),
+          expr: `(${a.expr}*${b.expr})`
+        });
+
+        // 减法必须保留两个方向
+        candidates.push({
+          value: a.value.sub(b.value),
+          expr: `(${a.expr}-${b.expr})`
+        });
+
+        candidates.push({
+          value: b.value.sub(a.value),
+          expr: `(${b.expr}-${a.expr})`
+        });
+
+        // 除法必须保留两个方向，但除数不能为0
+        const ab = a.value.div(b.value);
+        if (ab !== null) {
+          candidates.push({
+            value: ab,
+            expr: `(${a.expr}/${b.expr})`
+          });
+        }
+
+        const ba = b.value.div(a.value);
+        if (ba !== null) {
+          candidates.push({
+            value: ba,
+            expr: `(${b.expr}/${a.expr})`
+          });
+        }
+
+        for (const item of candidates) {
+          dfs([...rest, item]);
+        }
+      }
+    }
+  }
+
+  const items = nums.map(x => ({
+    value: new Fraction(BigInt(x)),
+    expr: String(x)
+  }));
+
+  dfs(items);
+
+  return [...solutions].sort();
+}
+
+function formatExpression(expr) {
+  return expr
+    .replace(/\*/g, "×")
+    .replace(/\//g, "÷")
+    .replace(/\+/g, "+")
+    .replace(/-/g, "−");
+}
+
+function setInputs(values) {
+  values.forEach((v, i) => {
+    document.getElementById(`n${i + 1}`).value = v;
+  });
+}
+
+function getInputs() {
+  const values = [];
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById(`n${i}`);
+    const raw = el.value.trim();
+
+    if (raw === "") {
+      throw new Error(`第 ${i} 个数字不能为空。`);
+    }
+
+    if (!/^\d+$/.test(raw)) {
+      throw new Error(`第 ${i} 个数字必须是整数。`);
+    }
+
+    const value = Number(raw);
+
+    if (!Number.isInteger(value) || value < 1 || value > 13) {
+      throw new Error(`第 ${i} 个数字必须在 1～13 之间。`);
+    }
+
+    values.push(value);
+  }
+  return values;
+}
+
+const calcBtn = document.getElementById("calcBtn");
+const clearBtn = document.getElementById("clearBtn");
+const copyBtn = document.getElementById("copyBtn");
+
+const errorBox = document.getElementById("error");
+const loading = document.getElementById("loading");
+const emptyState = document.getElementById("emptyState");
+const resultContent = document.getElementById("resultContent");
+const resultTitle = document.getElementById("resultTitle");
+const summary = document.getElementById("summary");
+const badge = document.getElementById("badge");
+const countText = document.getElementById("countText");
+const solutionList = document.getElementById("solutionList");
+const footerNote = document.getElementById("footerNote");
+
+let currentSolutions = [];
+
+function showError(message) {
+  errorBox.textContent = message;
+  errorBox.style.display = "block";
+}
+
+function clearError() {
+  errorBox.textContent = "";
+  errorBox.style.display = "none";
+}
+
+function calculate() {
+  clearError();
+
+  let nums;
+  try {
+    nums = getInputs();
+  } catch (err) {
+    showError(err.message);
+    return;
+  }
+
+  loading.style.display = "block";
+
+  // 让页面先完成 UI 更新，再进行计算
+  setTimeout(() => {
+    try {
+      currentSolutions = findAllSolutions(nums);
+
+      emptyState.style.display = "none";
+      resultContent.style.display = "block";
+
+      resultTitle.textContent = `输入：${nums.join("、")}`;
+
+      if (currentSolutions.length === 0) {
+        badge.style.display = "inline-flex";
+        badge.className = "badge danger";
+        badge.textContent = "无解";
+
+        summary.textContent = "穷举了所有允许的运算顺序、括号结构和运算符组合，没有得到 24。";
+        countText.textContent = "0 种解法";
+        solutionList.innerHTML = "";
+        copyBtn.style.display = "none";
+        footerNote.textContent = "允许 +、−、×、÷ 和括号；每个输入数字必须且只能使用一次。";
+      } else {
+        badge.style.display = "inline-flex";
+        badge.className = "badge success";
+        badge.textContent = "有解";
+
+        summary.textContent = "已完成精确穷举。";
+        countText.textContent = `共 ${currentSolutions.length} 种不同解法`;
+
+        solutionList.innerHTML = currentSolutions.map((expr, idx) => {
+          return `
+            <div class="solution">
+              <span class="solution-number">${idx + 1}.</span>${formatExpression(expr)} = 24
+            </div>
+          `;
+        }).join("");
+
+        copyBtn.style.display = "inline-block";
+        footerNote.textContent = "使用精确分数计算，不受浮点数舍入误差影响；相同的表达式会自动去重。";
+      }
+    } finally {
+      loading.style.display = "none";
+    }
+  }, 0);
+}
+
+function clearAll() {
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById(`n${i}`).value = "";
+  }
+
+  clearError();
+  currentSolutions = [];
+
+  resultTitle.textContent = "等待计算";
+  summary.textContent = "输入四个数字后点击“计算 24 点”。";
+  badge.style.display = "none";
+  emptyState.style.display = "block";
+  resultContent.style.display = "none";
+  solutionList.innerHTML = "";
+}
+
+calcBtn.addEventListener("click", calculate);
+clearBtn.addEventListener("click", clearAll);
+
+document.querySelectorAll(".example").forEach(el => {
+  el.addEventListener("click", () => {
+    const values = el.dataset.values.split(",").map(Number);
+    setInputs(values);
+    calculate();
+  });
+});
+
+// PC端支持按 Enter 计算
+document.querySelectorAll(".num-input").forEach(el => {
+  el.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      calculate();
+    }
+  });
+});
+
+copyBtn.addEventListener("click", async () => {
+  if (!currentSolutions.length) return;
+
+  const text = currentSolutions
+    .map((expr, idx) => `${idx + 1}. ${formatExpression(expr)} = 24`)
+    .join("\n");
+
+  try {
+    await navigator.clipboard.writeText(text);
+    const old = copyBtn.textContent;
+    copyBtn.textContent = "已复制";
+    setTimeout(() => {
+      copyBtn.textContent = old;
+    }, 1200);
+  } catch {
+    // 兼容部分旧浏览器
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    ta.remove();
+
+    const old = copyBtn.textContent;
+    copyBtn.textContent = "已复制";
+    setTimeout(() => {
+      copyBtn.textContent = old;
+    }, 1200);
+  }
+});
+</script>
+</body>
+</html>
