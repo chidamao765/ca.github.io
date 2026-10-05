@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>北京出发 · 大环线慢旅居｜高德自驾修正版</title>
+<style>
+:root{
+  --bg:#f4f6f9;--card:#fff;--text:#172033;--muted:#6b7280;--line:#e5e7eb;
+  --blue:#2563eb;--green:#15803d;--amber:#b45309;--red:#b91c1c;
+  --shadow:0 12px 34px rgba(15,23,42,.10);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--text);background:var(--bg)}
+.app{height:100%;display:grid;grid-template-columns:430px 1fr}
+.sidebar{height:100%;overflow:auto;border-right:1px solid var(--line);padding:16px;background:var(--bg)}
+.mapbox{height:100%;position:relative;background:#dbe4ef}
+#map{position:absolute;inset:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 4px 15px rgba(15,23,42,.04)}
+.hero{background:linear-gradient(135deg,#111827,#1d4ed8);color:#fff;border:0;padding:20px}
+.hero h1{font-size:21px;margin:0 0 8px}
+.hero p{font-size:13px;line-height:1.65;margin:0;color:#dbeafe}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.stat{padding:9px;background:rgba(255,255,255,.11);border-radius:11px}
+.stat b{display:block;font-size:16px}.stat span{font-size:10px;color:#dbeafe}
+.title{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:14px;font-weight:800;margin-bottom:10px}
+.badge{font-size:10px;padding:4px 7px;border-radius:999px;background:#eef2f7;color:#4b5563;font-weight:600}
+.row{display:flex;gap:7px;flex-wrap:wrap}
+button{border:0;border-radius:10px;padding:9px 11px;cursor:pointer;font:inherit;font-weight:700;font-size:12px}
+.primary{background:#2563eb;color:#fff}.soft{background:#eaf0ff;color:#1d4ed8}.ghost{background:#fff;border:1px solid var(--line);color:#374151}
+button:disabled{opacity:.45;cursor:not-allowed}
+.status{font-size:12px;line-height:1.6;color:var(--muted);margin-top:8px}
+.progress{height:6px;border-radius:99px;background:#e5e7eb;overflow:hidden;margin-top:8px}.progress>div{height:100%;width:0;background:#2563eb;transition:.18s}
+.legend{font-size:10px;color:#6b7280;margin-top:8px;display:flex;gap:10px;flex-wrap:wrap}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+.stage{margin-bottom:13px}.stage-h{display:flex;align-items:center;gap:7px;font-weight:800;font-size:13px;margin:7px 0}
+.stage-color{width:9px;height:9px;border-radius:3px}
+.stop{display:grid;grid-template-columns:28px 1fr auto;gap:8px;align-items:center;padding:9px;border:1px solid var(--line);background:#fff;border-radius:11px;margin-bottom:6px;cursor:pointer}
+.stop:hover{box-shadow:0 5px 16px rgba(15,23,42,.06)}
+.num{width:27px;height:27px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:10px;font-weight:800}
+.name{font-size:12px;font-weight:800}.note{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.4}
+.seg{padding:10px;border:1px solid var(--line);border-radius:11px;background:#fff;margin-bottom:7px}
+.seg-top{display:flex;justify-content:space-between;gap:8px;align-items:center}.seg-route{font-size:12px;font-weight:800;line-height:1.45}
+.meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}.pill{font-size:10px;padding:4px 6px;border-radius:999px;background:#f3f4f6;color:#4b5563}
+.pill.ok{background:#dcfce7;color:#166534}.pill.warn{background:#ffedd5;color:#9a3412}.pill.danger{background:#fee2e2;color:#991b1b}
+.map-note{position:absolute;z-index:20;left:16px;top:16px;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-radius:14px;padding:11px 12px;box-shadow:var(--shadow);max-width:340px;border:1px solid rgba(255,255,255,.9)}
+.map-note b{font-size:13px}.map-note div{font-size:11px;color:#6b7280;margin-top:4px;line-height:1.5}
+.map-tools{position:absolute;right:16px;top:16px;z-index:21;display:flex;gap:7px}
+.placeholder{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 50% 30%,#eff6ff,#dbe4ef);z-index:5;padding:20px}
+.placeholder>div{max-width:540px;text-align:center;background:rgba(255,255,255,.96);padding:24px;border-radius:18px;box-shadow:var(--shadow)}
+.placeholder h2{margin:0 0 8px}.placeholder p{font-size:13px;color:#6b7280;line-height:1.7}
+dialog{border:0;padding:0;border-radius:18px;width:min(560px,calc(100% - 30px));box-shadow:0 30px 80px rgba(15,23,42,.25)}
+dialog::backdrop{background:rgba(15,23,42,.55);backdrop-filter:blur(3px)}
+.modal{padding:20px}.modal h2{margin:0 0 7px;font-size:19px}.modal p{font-size:12px;color:#6b7280;line-height:1.6}
+.field{margin-top:11px}.field label{font-size:12px;font-weight:800;display:block;margin-bottom:5px}
+.field input{width:100%;border:1px solid #cfd6e2;border-radius:10px;padding:10px;outline:none}
+.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:15px}
+.marker{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-size:10px;border:2px solid #fff;box-shadow:0 2px 8px rgba(15,23,42,.35)}
+@media(max-width:900px){
+  .app{grid-template-columns:1fr;grid-template-rows:54vh 46vh}
+  .mapbox{grid-row:1}.sidebar{grid-row:2;border-right:0;border-top:1px solid var(--line)}
+  .map-note{left:10px;top:10px;max-width:68%}.map-tools{right:10px;top:10px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="card hero">
+      <h1>北京出发 · 大环线慢旅居</h1>
+      <p>修正版：所有路线节点已内置经纬度，不再依赖高德地理编码。地图加载后应立即看到全部点位与总路线骨架。</p>
+      <div class="stats">
+        <div class="stat"><b id="statStops">0</b><span>路线节点</span></div>
+        <div class="stat"><b id="statKm">--</b><span>已算总里程</span></div>
+        <div class="stat"><b id="statHours">--</b><span>已算驾驶时长</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="title"><span>高德地图控制</span><span id="state" class="badge">未加载</span></div>
+      <div class="row">
+        <button id="loadBtn" class="primary">加载高德地图</button>
+        <button id="allBtn" class="soft" disabled>批量计算路段</button>
+        <button id="fitBtn" class="ghost" disabled>查看全程</button>
+      </div>
+      <div id="status" class="status">地图加载后会立即显示所有节点；“批量计算路段”用于获取高德真实驾车时间和里程。</div>
+      <div class="progress"><div id="bar"></div></div>
+      <div class="legend">
+        <span><i class="dot" style="background:#15803d"></i>≤5小时</span>
+        <span><i class="dot" style="background:#b45309"></i>5–6小时</span>
+        <span><i class="dot" style="background:#b91c1c"></i>&gt;6小时：纯赶路</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="title"><span>路线节点</span><span class="badge">点击定位</span></div>
+      <div id="stages"></div>
+    </div>
+
+    <div class="card">
+      <div class="title"><span>逐段驾车</span><span id="segCount" class="badge"></span></div>
+      <div id="segments"></div>
+    </div>
+  </aside>
+
+  <main class="mapbox">
+    <div id="map"></div>
+    <div id="placeholder" class="placeholder">
+      <div>
+        <h2>高德自驾路线修正版</h2>
+        <p>这版已经把北京、云台山、重庆、九寨沟、云南、广西、海南、阳朔、桂林以及返京中转点的经纬度直接写入网页。不会再因为地理编码失败导致“只有底图、没有点位”。</p>
+        <button id="placeholderBtn" class="primary">加载高德地图</button>
+      </div>
+    </div>
+    <div id="mapNote" class="map-note" style="display:none">
+      <b id="mapTitle">全程路线</b>
+      <div id="mapText">实线/虚线为行程骨架；点击左侧路段可显示真实驾车路线。</div>
+    </div>
+    <div id="mapTools" class="map-tools" style="display:none">
+      <button id="clearBtn" class="ghost">返回全程</button>
+    </div>
+  </main>
+</div>
+
+<dialog id="dlg">
+  <div class="modal">
+    <h2>连接高德地图 JS API 2.0</h2>
+    <p>请输入你的高德 <b>Web 端 Key</b> 和 <b>securityJsCode</b>。这版不再调用地理编码，所以只要底图和驾车插件权限正常，节点会立即出现。</p>
+    <div class="field">
+      <label>Web 端 Key</label>
+      <input id="keyInput" placeholder="高德 Web JS API Key">
+    </div>
+    <div class="field">
+      <label>securityJsCode</label>
+      <input id="secInput" placeholder="安全密钥">
+    </div>
+    <div class="actions">
+      <button id="cancelBtn" class="ghost">取消</button>
+      <button id="okBtn" class="primary">连接高德</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+const STAGES={
+1:{name:"中原 · 鄂西",c:"#2563eb"},
+2:{name:"湘西 · 恩施",c:"#7c3aed"},
+3:{name:"重庆 · 四川",c:"#db2777"},
+4:{name:"贵州",c:"#0891b2"},
+5:{name:"云南",c:"#059669"},
+6:{name:"广西南线 · 入海南",c:"#ca8a04"},
+7:{name:"海南",c:"#ea580c"},
+8:{name:"返程 · 阳朔桂林 · 北上",c:"#475569"}
+};
+
+/* 直接内置坐标，避免 Geocoder 失败导致全图空白 */
+const R=[
+{name:"北京",lng:116.4074,lat:39.9042,stage:1,note:"出发"},
+{name:"云台山",lng:113.4233,lat:35.4314,stage:1,note:"红石峡 / 茱萸峰"},
+{name:"洛阳",lng:112.4540,lat:34.6197,stage:1,note:"龙门石窟 / 白马寺"},
+{name:"宜昌",lng:111.2865,lat:30.6919,stage:1,note:"三峡 / 两坝一峡"},
+
+{name:"张家界",lng:110.4792,lat:29.3454,stage:2,note:"武陵源 / 天门山"},
+{name:"凤凰古城",lng:109.5996,lat:27.9483,stage:2,note:"古城慢游"},
+{name:"恩施",lng:109.4882,lat:30.2722,stage:2,note:"恩施大峡谷"},
+
+{name:"重庆",lng:106.5516,lat:29.5630,stage:3,note:"新增｜城市旅居 4–5 天"},
+{name:"成都",lng:104.0665,lat:30.5723,stage:3,note:"缩短至约 2–3 天"},
+{name:"九寨沟",lng:103.9186,lat:33.2600,stage:3,note:"九寨沟 / 黄龙"},
+{name:"成都（中转）",lng:104.0665,lat:30.5723,stage:3,note:"回程住 1 晚"},
+
+{name:"遵义",lng:106.9272,lat:27.7257,stage:4,note:"四川→贵州中转",transit:true},
+{name:"梵净山",lng:108.7070,lat:27.9158,stage:4,note:"按天气决定登山"},
+{name:"镇远古城",lng:108.4237,lat:27.0493,stage:4,note:"慢游"},
+{name:"西江千户苗寨",lng:108.1767,lat:26.4940,stage:4,note:"苗寨"},
+{name:"荔波",lng:107.8860,lat:25.4100,stage:4,note:"大小七孔"},
+{name:"贵阳",lng:106.6302,lat:26.6470,stage:4,note:"休整"},
+{name:"黄果树",lng:105.6670,lat:25.9950,stage:4,note:"瀑布 / 天星桥"},
+
+{name:"昆明",lng:102.8329,lat:24.8801,stage:5,note:"云南起点"},
+{name:"大理",lng:100.2676,lat:25.6065,stage:5,note:"洱海 / 喜洲"},
+{name:"丽江",lng:100.2330,lat:26.8721,stage:5,note:"丽江 / 束河"},
+{name:"楚雄",lng:101.5460,lat:25.0410,stage:5,note:"拆分长途驾驶",transit:true},
+{name:"建水",lng:102.8266,lat:23.6346,stage:5,note:"古城 + 中转"},
+{name:"元阳梯田",lng:102.7440,lat:23.1580,stage:5,note:"1 月重点"},
+{name:"西双版纳",lng:100.7979,lat:22.0017,stage:5,note:"避寒慢住"},
+
+{name:"砚山中转",lng:104.3370,lat:23.6050,stage:6,note:"拆分西双版纳→广西",transit:true},
+{name:"百色",lng:106.6184,lat:23.9020,stage:6,note:"桂西入口",transit:true},
+{name:"靖西",lng:106.4175,lat:23.1340,stage:6,note:"桂西山水"},
+{name:"德天瀑布",lng:106.7240,lat:22.8560,stage:6,note:"德天 / 明仕田园"},
+{name:"崇左",lng:107.3647,lat:22.3765,stage:6,note:"边关山水"},
+{name:"南宁",lng:108.3665,lat:22.8170,stage:6,note:"休整"},
+{name:"北海",lng:109.1193,lat:21.4733,stage:6,note:"海边 2–3 天"},
+{name:"徐闻港",lng:110.2100,lat:20.3750,stage:6,note:"轮渡交通日",transit:true},
+
+{name:"海口",lng:110.1983,lat:20.0440,stage:7,note:"海南起点"},
+{name:"文昌",lng:110.7977,lat:19.5434,stage:7,note:"东线"},
+{name:"万宁",lng:110.3911,lat:18.7951,stage:7,note:"建议长住"},
+{name:"陵水",lng:110.0372,lat:18.5050,stage:7,note:"东线"},
+{name:"三亚",lng:109.5119,lat:18.2528,stage:7,note:"2–3 天"},
+{name:"海口（返程）",lng:110.1983,lat:20.0440,stage:7,note:"返程过海"},
+
+{name:"徐闻港（返程）",lng:110.2100,lat:20.3750,stage:8,note:"轮渡交通日",transit:true},
+{name:"湛江",lng:110.3594,lat:21.2707,stage:8,note:"过海后休息",transit:true},
+{name:"梧州",lng:111.2791,lat:23.4769,stage:8,note:"返程中转",transit:true},
+{name:"阳朔",lng:110.4966,lat:24.7785,stage:8,note:"新增｜建议 2–3 天"},
+{name:"桂林",lng:110.2900,lat:25.2736,stage:8,note:"新增｜建议 1–2 天"},
+{name:"衡阳",lng:112.5719,lat:26.8932,stage:8,note:"北返拆分",transit:true},
+{name:"岳阳",lng:113.1289,lat:29.3571,stage:8,note:"可顺路岳阳楼",transit:true},
+{name:"信阳",lng:114.0911,lat:32.1486,stage:8,note:"北返拆分",transit:true},
+{name:"郑州",lng:113.6254,lat:34.7466,stage:8,note:"北返休整",transit:true},
+{name:"石家庄",lng:114.5149,lat:38.0428,stage:8,note:"最后中转",transit:true},
+{name:"北京（返京）",lng:116.4074,lat:39.9042,stage:8,note:"春节前返京"}
+];
+
+let AMapObj=null,map=null,overview=null,markers=[],currentDriving=null;
+let segData=new Array(R.length-1).fill(null);
+const cacheKey="roadtrip_amap_fixed_v2";
+try{
+  const x=JSON.parse(localStorage.getItem(cacheKey)||"null");
+  if(Array.isArray(x)&&x.length===segData.length)segData=x;
+}catch(e){}
+
+const $=id=>document.getElementById(id);
+$("statStops").textContent=R.length;
+$("segCount").textContent=(R.length-1)+" 段";
+
+function renderStops(){
+  $("stages").innerHTML="";
+  Object.keys(STAGES).forEach(k=>{
+    const s=STAGES[k],wrap=document.createElement("div");
+    wrap.className="stage";
+    wrap.innerHTML=`<div class="stage-h"><i class="stage-color" style="background:${s.c}"></i>${k}. ${s.name}</div>`;
+    R.forEach((p,i)=>{
+      if(String(p.stage)!==String(k))return;
+      const el=document.createElement("div");el.className="stop";
+      el.innerHTML=`<div class="num" style="background:${s.c}">${i+1}</div>
+      <div><div class="name">${p.name}</div><div class="note">${p.note}</div></div>
+      <span class="badge">${p.transit?"中转":"停留"}</span>`;
+      el.onclick=()=>focusStop(i);
+      wrap.appendChild(el);
+    });
+    $("stages").appendChild(wrap);
+  });
+}
+function cls(sec){
+  if(!Number.isFinite(sec))return {c:"",t:"未计算"};
+  const h=sec/3600;
+  if(h>6)return {c:"danger",t:">6h · 纯赶路"};
+  if(h>=5)return {c:"warn",t:"5–6h · 到达后休息"};
+  return {c:"ok",t:"≤5h · 可安排活动"};
+}
+function timeText(sec){
+  if(!Number.isFinite(sec))return "--";
+  const h=Math.floor(sec/3600),m=Math.round(sec%3600/60);
+  return `${h}小时${m?m+"分":""}`;
+}
+function kmText(m){return Number.isFinite(m)?Math.round(m/1000)+" km":"--"}
+function renderSeg(){
+  $("segments").innerHTML="";
+  segData.forEach((d,i)=>{
+    const c=d?cls(d.time):cls(NaN),el=document.createElement("div");el.className="seg";
+    el.innerHTML=`<div class="seg-top">
+      <div class="seg-route">${i+1}. ${R[i].name} → ${R[i+1].name}</div>
+      <button class="ghost" data-i="${i}" ${map?"":"disabled"}>显示路线</button>
+    </div>
+    <div class="meta">
+      <span class="pill">${d?kmText(d.distance):"里程未算"}</span>
+      <span class="pill">${d?timeText(d.time):"时长未算"}</span>
+      <span class="pill ${c.c}">${c.t}</span>
+    </div>`;
+    el.querySelector("button").onclick=()=>planOne(i,true);
+    $("segments").appendChild(el);
+  });
+  updateTotals();
+}
+function updateTotals(){
+  let km=0,sec=0,n=0;
+  segData.forEach(d=>{if(d){km+=d.distance||0;sec+=d.time||0;n++}});
+  $("statKm").textContent=n?Math.round(km/1000).toLocaleString()+" km":"--";
+  $("statHours").textContent=n?Math.round(sec/3600)+" h":"--";
+}
+renderStops();renderSeg();
+
+function setStatus(t,p=0){$("status").textContent=t;$("bar").style.width=Math.max(0,Math.min(100,p))+"%"}
+function openDlg(){
+  $("keyInput").value=localStorage.getItem("amap_key")||"";
+  $("secInput").value=localStorage.getItem("amap_sec")||"";
+  $("dlg").showModal();
+}
+$("loadBtn").onclick=openDlg;$("placeholderBtn").onclick=openDlg;$("cancelBtn").onclick=()=>$("dlg").close();
+$("okBtn").onclick=()=>{
+  const key=$("keyInput").value.trim(),sec=$("secInput").value.trim();
+  if(!key||!sec){alert("请同时填写 Key 和 securityJsCode");return}
+  localStorage.setItem("amap_key",key);localStorage.setItem("amap_sec",sec);
+  $("dlg").close();initMap(key,sec);
+};
+
+function loadLoader(){
+  return new Promise((resolve,reject)=>{
+    if(window.AMapLoader)return resolve();
+    const s=document.createElement("script");
+    s.src="https://webapi.amap.com/loader.js";
+    s.onload=resolve;s.onerror=()=>reject(new Error("高德 Loader 加载失败"));
+    document.head.appendChild(s);
+  });
+}
+async function initMap(key,sec){
+  try{
+    setStatus("正在加载高德地图…",15);
+    window._AMapSecurityConfig={securityJsCode:sec};
+    await loadLoader();
+    AMapObj=await AMapLoader.load({
+      key,version:"2.0",
+      plugins:["AMap.Scale","AMap.ToolBar","AMap.Driving"]
+    });
+    map=new AMapObj.Map("map",{zoom:4,center:[105,30],viewMode:"2D"});
+    map.addControl(new AMapObj.Scale());
+    map.addControl(new AMapObj.ToolBar({position:{right:"18px",bottom:"36px"}}));
+    drawAll();
+    $("placeholder").style.display="none";$("mapNote").style.display="block";$("mapTools").style.display="flex";
+    $("state").textContent="已连接";$("state").style.background="#dcfce7";$("state").style.color="#166534";
+    $("allBtn").disabled=false;$("fitBtn").disabled=false;
+    renderSeg();
+    setStatus(`已加载：${R.length} 个节点已直接显示。虚线为全程骨架；点击任意路段可查看高德真实驾车路线。`,100);
+    setTimeout(()=>$("bar").style.width="0",900);
+  }catch(e){
+    console.error(e);$("state").textContent="加载失败";
+    setStatus("加载失败："+(e.message||e),0);
+    alert("高德地图加载失败，请检查 Key、securityJsCode 和域名白名单。");
+  }
+}
+function drawAll(){
+  markers.forEach(m=>map.remove(m));markers=[];
+  if(overview){map.remove(overview);overview=null}
+  const path=[];
+  R.forEach((p,i)=>{
+    const pos=new AMapObj.LngLat(p.lng,p.lat);path.push(pos);
+    const m=new AMapObj.Marker({
+      position:pos,
+      content:`<div class="marker" style="background:${STAGES[p.stage].c}">${i+1}</div>`,
+      offset:new AMapObj.Pixel(-14,-14),
+      title:`${i+1}. ${p.name}`,
+      zIndex:100+i
+    });
+    m.on("click",()=>{
+      map.setZoomAndCenter(9,pos);
+      $("mapTitle").textContent=`${i+1}. ${p.name}`;
+      $("mapText").textContent=p.note;
+    });
+    markers.push(m);
+  });
+  map.add(markers);
+  overview=new AMapObj.Polyline({
+    path,
+    strokeColor:"#2563eb",
+    strokeOpacity:.62,
+    strokeWeight:5,
+    strokeStyle:"dashed",
+    showDir:true,
+    zIndex:40
+  });
+  map.add(overview);
+  map.setFitView(markers,false,[70,70,70,70],4);
+}
+function showOverview(){
+  if(currentDriving){try{currentDriving.clear()}catch(e){}currentDriving=null}
+  if(overview)overview.show();markers.forEach(m=>m.show());
+  map.setFitView(markers,false,[70,70,70,70],4);
+  $("mapTitle").textContent="全程路线";
+  $("mapText").textContent="虚线为总行程骨架；左侧逐段按钮会显示高德真实驾车路线。";
+}
+$("fitBtn").onclick=showOverview;$("clearBtn").onclick=showOverview;
+function focusStop(i){
+  if(!map)return;
+  if(currentDriving){try{currentDriving.clear()}catch(e){}currentDriving=null}
+  if(overview)overview.show();markers.forEach(m=>m.show());
+  map.setZoomAndCenter(9,[R[i].lng,R[i].lat]);
+  $("mapTitle").textContent=`${i+1}. ${R[i].name}`;$("mapText").textContent=R[i].note;
+}
+
+function drivingSearch(i,show){
+  return new Promise((resolve,reject)=>{
+    const opt={policy:AMapObj.DrivingPolicy.LEAST_TIME,showTraffic:false};
+    if(show)opt.map=map;
+    const drv=new AMapObj.Driving(opt);
+    const a=new AMapObj.LngLat(R[i].lng,R[i].lat);
+    const b=new AMapObj.LngLat(R[i+1].lng,R[i+1].lat);
+    drv.search(a,b,(status,result)=>{
+      if(status==="complete"&&result&&result.routes&&result.routes.length){
+        const rr=result.routes[0];
+        resolve({distance:Number(rr.distance),time:Number(rr.time),drv});
+      }else{
+        try{drv.clear()}catch(e){}
+        reject(new Error("高德驾车规划失败："+status));
+      }
+    });
+  });
+}
+async function planOne(i,show=true){
+  if(!map){openDlg();return}
+  if(currentDriving){try{currentDriving.clear()}catch(e){}currentDriving=null}
+  if(overview)overview.hide();markers.forEach(m=>m.hide());
+  setStatus(`正在规划：${R[i].name} → ${R[i+1].name}`,35);
+  try{
+    const x=await drivingSearch(i,show);
+    currentDriving=x.drv;
+    segData[i]={distance:x.distance,time:x.time};
+    localStorage.setItem(cacheKey,JSON.stringify(segData));
+    const c=cls(x.time);
+    $("mapTitle").textContent=`${R[i].name} → ${R[i+1].name}`;
+    $("mapText").textContent=`${kmText(x.distance)} · ${timeText(x.time)} · ${c.t}`;
+    renderSeg();setStatus(`已规划：${R[i].name} → ${R[i+1].name}｜${kmText(x.distance)}｜${timeText(x.time)}｜${c.t}`,100);
+    setTimeout(()=>$("bar").style.width="0",700);
+  }catch(e){
+    console.error(e);showOverview();setStatus(e.message||"规划失败",0);
+    alert("这个路段高德没有返回驾车路线。可能是服务权限、调用频率或轮渡跨海路段造成的。");
+  }
+}
+
+$("allBtn").onclick=async()=>{
+  $("allBtn").disabled=true;
+  let ok=0,fail=0;
+  for(let i=0;i<segData.length;i++){
+    if(segData[i]){ok++;continue}
+    setStatus(`批量计算 ${i+1}/${segData.length}：${R[i].name} → ${R[i+1].name}`,Math.round(i/segData.length*100));
+    try{
+      const x=await drivingSearch(i,false);
+      segData[i]={distance:x.distance,time:x.time};ok++;
+      try{x.drv.clear()}catch(e){}
+      localStorage.setItem(cacheKey,JSON.stringify(segData));
+    }catch(e){fail++}
+    renderSeg();
+    await new Promise(r=>setTimeout(r,220));
+  }
+  $("allBtn").disabled=false;
+  setStatus(`批量计算完成：成功 ${ok} 段，失败 ${fail} 段。轮渡跨海段如失败可忽略，作为纯交通日处理。`,100);
+  setTimeout(()=>$("bar").style.width="0",900);
+};
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"7939e04a4baf43c8b86a560f74aac60e","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
