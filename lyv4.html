@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<title>北京出发 · 大环线慢旅居｜高德自驾手机导航版</title>
+<style>
+:root{
+  --bg:#f4f6f8;--card:#fff;--text:#142033;--muted:#6b7280;--line:#e5e7eb;
+  --primary:#2563eb;--primary2:#1d4ed8;--green:#15803d;--amber:#b45309;--red:#b91c1c;
+  --shadow:0 12px 35px rgba(15,23,42,.12);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text)}
+button,input{font:inherit}
+button{cursor:pointer}
+.app{height:100dvh;display:grid;grid-template-columns:430px 1fr;overflow:hidden}
+.sidebar{height:100%;overflow:auto;padding:16px;border-right:1px solid var(--line);background:var(--bg)}
+.map-shell{height:100%;position:relative;background:#dfe7f0;overflow:hidden}
+#map{position:absolute;inset:0}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 4px 18px rgba(15,23,42,.04)}
+.hero{border:0;background:linear-gradient(135deg,#0f172a,#1e40af);color:#fff;padding:19px}
+.hero h1{font-size:21px;margin:0 0 7px}.hero p{font-size:12px;line-height:1.7;margin:0;color:#dbeafe}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:13px}
+.stat{padding:9px;border-radius:11px;background:rgba(255,255,255,.11)}
+.stat b{display:block;font-size:16px}.stat span{font-size:10px;color:#dbeafe}
+.title{font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.badge{font-size:10px;padding:4px 7px;border-radius:999px;background:#eef2f7;color:#4b5563;white-space:nowrap}
+.row{display:flex;gap:7px;flex-wrap:wrap}
+.btn{border:0;border-radius:10px;padding:9px 11px;font-size:12px;font-weight:800;background:#eaf0ff;color:#1d4ed8}
+.btn.primary{background:var(--primary);color:white}.btn.ghost{background:#fff;color:#374151;border:1px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.status{font-size:11px;color:var(--muted);line-height:1.55;margin-top:8px}
+.progress{height:6px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin-top:7px}.progress>div{height:100%;width:0;background:var(--primary);transition:.2s}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:10px;color:#6b7280;margin-top:8px}.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}
+.stage{margin-bottom:13px}.stage-head{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:800;margin:8px 0}
+.stage-c{width:9px;height:9px;border-radius:3px}
+.stop{display:grid;grid-template-columns:48px 1fr auto;gap:8px;align-items:center;padding:9px;border:1px solid var(--line);background:#fff;border-radius:11px;margin-bottom:6px;cursor:pointer}
+.stop:hover{box-shadow:0 5px 17px rgba(15,23,42,.06)}
+.date-chip{height:27px;border-radius:9px;display:grid;place-items:center;color:#fff;font-weight:900;font-size:10px;letter-spacing:-.2px}
+.stop-name{font-size:12px;font-weight:800}.stop-sub{font-size:10px;color:var(--muted);margin-top:2px;line-height:1.35}
+.seg{padding:10px;border:1px solid var(--line);border-radius:11px;background:#fff;margin-bottom:7px}
+.seg-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.seg-route{font-size:12px;font-weight:800;line-height:1.45}
+.meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}.pill{font-size:10px;border-radius:999px;padding:4px 6px;background:#f3f4f6;color:#4b5563}
+.pill.ok{background:#dcfce7;color:#166534}.pill.warn{background:#ffedd5;color:#9a3412}.pill.danger{background:#fee2e2;color:#991b1b}
+
+.placeholder{position:absolute;inset:0;z-index:10;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 50% 25%,#eff6ff,#dce5ef)}
+.placeholder-box{max-width:560px;text-align:center;background:rgba(255,255,255,.97);padding:24px;border-radius:19px;box-shadow:var(--shadow)}
+.placeholder h2{margin:0 0 8px;font-size:20px}.placeholder p{font-size:12px;color:#6b7280;line-height:1.7}
+.map-info{position:absolute;left:15px;top:15px;z-index:20;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);box-shadow:var(--shadow);border-radius:14px;padding:11px 12px;max-width:350px}
+.map-info b{font-size:13px}.map-info div{font-size:11px;color:#6b7280;line-height:1.45;margin-top:4px}
+.map-tools{position:absolute;right:15px;top:15px;z-index:21;display:flex;gap:7px}
+.route-result{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:22;width:min(560px,calc(100% - 28px));background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.9);border-radius:15px;padding:12px 14px;box-shadow:var(--shadow);display:none}
+.route-result .rr-title{font-size:13px;font-weight:900}.route-result .rr-meta{font-size:11px;color:#6b7280;margin-top:5px;line-height:1.45}
+.route-result .rr-tip{font-size:10px;margin-top:6px;font-weight:700}
+
+.map-marker{min-width:43px;height:28px;padding:0 7px;border-radius:10px;display:grid;place-items:center;color:#fff;font-weight:900;font-size:10px;border:2px solid #fff;box-shadow:0 2px 8px rgba(15,23,42,.38);white-space:nowrap}
+.map-marker.startend{background:#0f172a!important}
+
+.detail-overlay{position:fixed;z-index:1000;inset:0;background:#f4f6f8;display:none}
+.detail-overlay.open{display:block}
+.detail-wrap{height:100%;display:grid;grid-template-columns:minmax(420px,520px) 1fr;background:#f4f6f8}
+.detail-panel{height:100%;overflow:auto;background:#fff;border-right:1px solid var(--line)}
+.detail-hero{padding:calc(18px + env(safe-area-inset-top)) 20px 18px;background:linear-gradient(145deg,#0f172a,#1e40af);color:#fff}
+.detail-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.back{border:0;background:rgba(255,255,255,.13);color:#fff;border-radius:10px;padding:8px 10px;font-size:12px;font-weight:800}
+.detail-date{font-size:12px;color:#dbeafe;font-weight:700}
+.detail-hero h2{font-size:26px;margin:18px 0 5px}.detail-stay{font-size:12px;color:#dbeafe}
+.detail-body{padding:18px 20px 90px}
+.section{margin-bottom:21px}.section h3{font-size:14px;margin:0 0 9px}.section p{font-size:12px;color:#4b5563;line-height:1.75;margin:0}
+.attraction{padding:12px 0;border-bottom:1px solid #eef0f3}.attraction:last-child{border-bottom:0}
+.attr-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.attr-name{font-size:13px;font-weight:800}
+.level{font-size:10px;padding:4px 7px;border-radius:999px;font-weight:900;white-space:nowrap}
+.level.a5{background:#fee2e2;color:#991b1b}.level.a4{background:#ffedd5;color:#9a3412}.level.other{background:#eef2ff;color:#3730a3}
+.attr-note{font-size:11px;color:#6b7280;line-height:1.55;margin-top:5px}
+.detail-nav{position:sticky;bottom:0;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);padding:10px 14px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line);display:flex;gap:8px}
+.detail-nav button{flex:1}
+.detail-map{position:relative;height:100%;background:#dfe7f0}
+#detailMapGhost{position:absolute;inset:0;display:grid;place-items:center;color:#64748b;font-size:13px;text-align:center;padding:30px}
+.desktop-hint{max-width:440px;line-height:1.7}
+
+.mobile-bottom,.mobile-list{display:none}
+dialog{border:0;padding:0;border-radius:18px;width:min(560px,calc(100% - 28px));box-shadow:0 30px 80px rgba(15,23,42,.26)}
+dialog::backdrop{background:rgba(15,23,42,.55);backdrop-filter:blur(3px)}
+.modal{padding:20px}.modal h2{margin:0 0 7px;font-size:19px}.modal p{font-size:12px;color:#6b7280;line-height:1.65}
+.field{margin-top:11px}.field label{font-size:12px;font-weight:800;display:block;margin-bottom:5px}
+.field input{width:100%;padding:10px;border:1px solid #cfd6e2;border-radius:10px;outline:none}
+.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:15px}
+
+@media(max-width:900px){
+  .app{display:block;height:100dvh}.sidebar{display:none}.map-shell{height:100dvh}
+  .map-info{left:10px;top:calc(10px + env(safe-area-inset-top));max-width:63%;padding:9px 10px}
+  .map-info b{font-size:12px}.map-info div{font-size:10px}
+  .map-tools{right:10px;top:calc(10px + env(safe-area-inset-top))}
+  .map-tools .btn{padding:8px 9px;font-size:10px}
+  .route-result{bottom:calc(86px + env(safe-area-inset-bottom));padding:11px 12px}
+  .mobile-bottom{position:absolute;left:0;right:0;bottom:0;z-index:30;display:block;background:rgba(255,255,255,.97);backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:8px 10px calc(8px + env(safe-area-inset-bottom))}
+  .mobile-actions{display:flex;gap:7px;margin-bottom:7px}.mobile-actions button{flex:1;border:0;border-radius:10px;padding:9px 8px;font-size:11px;font-weight:900;background:#eef2ff;color:#1d4ed8}
+  .node-strip{display:flex;gap:7px;overflow:auto;scrollbar-width:none;padding-bottom:1px}.node-strip::-webkit-scrollbar{display:none}
+  .node-mini{flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:11px;padding:7px 9px;min-width:82px}
+  .node-mini b{display:block;font-size:10px}.node-mini span{font-size:9px;color:#6b7280}
+  .mobile-list{position:fixed;inset:0;z-index:900;background:#f4f6f8;overflow:auto;padding:calc(14px + env(safe-area-inset-top)) 12px calc(30px + env(safe-area-inset-bottom))}
+  .mobile-list.open{display:block}
+  .ml-head{position:sticky;top:0;background:rgba(244,246,248,.96);backdrop-filter:blur(10px);z-index:3;display:flex;justify-content:space-between;align-items:center;padding:4px 0 12px}
+  .ml-head h2{margin:0;font-size:18px}.ml-grid{display:grid;gap:8px}
+  .ml-item{display:grid;grid-template-columns:52px 1fr auto;gap:9px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:13px;padding:10px}
+  .ml-date{font-size:11px;font-weight:900;color:#fff;border-radius:9px;padding:7px 4px;text-align:center}
+  .ml-name{font-size:13px;font-weight:900}.ml-sub{font-size:10px;color:#6b7280;margin-top:3px}
+  .detail-wrap{display:block}.detail-panel{border:0;height:100%;overflow:auto}.detail-map{display:none}
+  .detail-hero{padding-top:calc(16px + env(safe-area-inset-top));position:sticky;top:0;z-index:2}
+  .detail-hero h2{font-size:24px;margin-top:14px}.detail-body{padding:16px 16px 95px}
+  .section{margin-bottom:18px}.section h3{font-size:14px}.section p{font-size:12px}
+  .attraction{padding:11px 0}.attr-name{font-size:13px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="card hero">
+      <h1>北京出发 · 大环线慢旅居</h1>
+      <p>全程自驾 · 新增乐山/峨眉山 · 节点以到达日期显示 · 点击虚线路段即可请求高德真实驾车路线。</p>
+      <div class="stats">
+        <div class="stat"><b id="statStops">0</b><span>路线节点</span></div>
+        <div class="stat"><b id="statKm">--</b><span>已计算里程</span></div>
+        <div class="stat"><b id="statHours">--</b><span>已计算驾驶</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title"><span>高德地图</span><span id="state" class="badge">未加载</span></div>
+      <div class="row">
+        <button class="btn primary" id="loadBtn">加载地图</button>
+        <button class="btn" id="allBtn" disabled>计算全部路段</button>
+        <button class="btn ghost" id="fitBtn" disabled>全程视图</button>
+      </div>
+      <div id="status" class="status">地图加载后直接显示全部日期节点和可点击虚线路段。</div>
+      <div class="progress"><div id="bar"></div></div>
+      <div class="legend">
+        <span><i class="dot" style="background:#15803d"></i>≤5h</span>
+        <span><i class="dot" style="background:#b45309"></i>5–6h</span>
+        <span><i class="dot" style="background:#b91c1c"></i>&gt;6h纯赶路</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="title"><span>旅行日期节点</span><span class="badge">点击看详情</span></div>
+      <div id="stages"></div>
+    </div>
+    <div class="card">
+      <div class="title"><span>逐段驾驶</span><span id="segCount" class="badge"></span></div>
+      <div id="segments"></div>
+    </div>
+  </aside>
+
+  <main class="map-shell">
+    <div id="map"></div>
+    <div id="placeholder" class="placeholder">
+      <div class="placeholder-box">
+        <h2>高德自驾 · 手机导航版</h2>
+        <p>这版不使用地理编码。所有节点都内置坐标；虚线拆成了独立可点击路段，点击后调用高德 Driving，并根据返回的每一步 path 手动画出真实道路路线。</p>
+        <button class="btn primary" id="placeholderBtn">加载高德地图</button>
+      </div>
+    </div>
+    <div id="mapInfo" class="map-info" style="display:none">
+      <b id="mapTitle">全程路线</b>
+      <div id="mapText">点击日期节点看详情；点击两点之间虚线看真实驾车路线。</div>
+    </div>
+    <div id="mapTools" class="map-tools" style="display:none">
+      <button class="btn ghost" id="backMapBtn">返回全程</button>
+    </div>
+    <div id="routeResult" class="route-result">
+      <div class="rr-title" id="rrTitle"></div>
+      <div class="rr-meta" id="rrMeta"></div>
+      <div class="rr-tip" id="rrTip"></div>
+    </div>
+
+    <div class="mobile-bottom">
+      <div class="mobile-actions">
+        <button id="mobileListBtn">☰ 行程列表</button>
+        <button id="mobileAllBtn">批量算路</button>
+        <button id="mobileFitBtn">全程视图</button>
+      </div>
+      <div id="nodeStrip" class="node-strip"></div>
+    </div>
+  </main>
+</div>
+
+<div id="mobileList" class="mobile-list">
+  <div class="ml-head">
+    <h2>完整行程</h2>
+    <button class="btn ghost" id="closeListBtn">返回地图</button>
+  </div>
+  <div id="mobileListItems" class="ml-grid"></div>
+</div>
+
+<div id="detailOverlay" class="detail-overlay">
+  <div class="detail-wrap">
+    <div class="detail-panel">
+      <div id="detailHero" class="detail-hero">
+        <div class="detail-top">
+          <button class="back" id="detailBackBtn">← 返回</button>
+          <span class="detail-date" id="detailDate"></span>
+        </div>
+        <h2 id="detailName"></h2>
+        <div class="detail-stay" id="detailStay"></div>
+      </div>
+      <div class="detail-body">
+        <div class="section">
+          <h3>为什么停这里</h3>
+          <p id="detailReason"></p>
+        </div>
+        <div class="section">
+          <h3>附近值得去的景点</h3>
+          <div id="detailAttractions"></div>
+        </div>
+        <div class="section">
+          <h3>自驾提示</h3>
+          <p id="detailDrive"></p>
+        </div>
+      </div>
+      <div class="detail-nav">
+        <button class="btn ghost" id="prevBtn">上一站</button>
+        <button class="btn primary" id="routeFromHereBtn">规划到下一站</button>
+        <button class="btn ghost" id="nextBtn">下一站</button>
+      </div>
+    </div>
+    <div class="detail-map">
+      <div id="detailMapGhost">
+        <div class="desktop-hint">
+          <b>节点详情页</b><br>
+          手机端这里会变成全屏二级页面；返回即可继续操作地图。<br><br>
+          景区 A 级信息以公开文旅资料为参考，出发前仍建议以景区最新公告为准。
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<dialog id="dlg">
+  <div class="modal">
+    <h2>连接高德 JS API 2.0</h2>
+    <p>页面会优先读取预设载荷 <b>window.__AMAP_PAYLOAD__</b> 或 URL 参数；只有没有找到有效 Key 时才显示此输入框。手工输入后仅保存在浏览器本地。</p>
+    <div class="field"><label>Web 端 Key</label><input id="keyInput" placeholder="高德 Web JS API Key"></div>
+    <div class="field"><label>securityJsCode</label><input id="secInput" placeholder="安全密钥"></div>
+    <div class="actions">
+      <button class="btn ghost" id="cancelBtn">取消</button>
+      <button class="btn primary" id="okBtn">连接</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+const STAGES={
+1:{name:"中原 · 鄂西",c:"#2563eb"},
+2:{name:"湘西 · 恩施",c:"#7c3aed"},
+3:{name:"重庆 · 四川",c:"#db2777"},
+4:{name:"贵州",c:"#0891b2"},
+5:{name:"云南",c:"#059669"},
+6:{name:"广西南线 · 入海南",c:"#ca8a04"},
+7:{name:"海南",c:"#ea580c"},
+8:{name:"返程 · 阳朔桂林 · 北上",c:"#475569"}
+};
+const A=(name,level,note)=>({name,level,note});
+const R=[
+{name:"北京",date:"10/10",range:"10月10日出发",lng:116.4074,lat:39.9042,stage:1,stay:"出发日",reason:"整条大环线起点。当天以离京和长途驾驶为主，不额外安排市内景点。",drive:"北京到云台山属于长距离转场。如果高德实时算路超过6小时，当天只赶路，到酒店后休息。",near:[A("故宫博物院","5A","如出发前还有空余时间，可作为北京代表性人文景点。"),A("颐和园","5A","皇家园林，适合另行安排半天以上。")]},
+{name:"云台山",date:"10/10",range:"10月10日—10月13日",lng:113.4233,lat:35.4314,stage:1,stay:"约3个完整游玩日",reason:"把北方山地秋色放在行程最前面，抓住10月中旬红叶和峡谷色彩，同时从北京向西南自然过渡。",drive:"抵达日若驾驶超过6小时不安排景点；之后把红石峡、茱萸峰拆成不同天，避免连续暴走。",near:[A("云台山风景名胜区","5A","红石峡、潭瀑峡、茱萸峰是核心。"),A("青天河景区","5A","焦作周边可选，时间紧则不必额外绕行。")]},
+{name:"洛阳",date:"10/14",range:"10月14日—10月17日",lng:112.4540,lat:34.6197,stage:1,stay:"3—4天",reason:"自然景观之后加入历史文化段，也给前几天山地步行一个缓冲；10月天气适合石窟和古城慢游。",drive:"云台山到洛阳通常是轻松转场，到达后可以安排老城夜游。",near:[A("龙门石窟","5A","洛阳核心，建议至少半天。"),A("老君山—鸡冠洞旅游区","5A","适合单独一天，若想控制强度可二选一。"),A("白马寺","4A","佛教文化、人文向景点。")]},
+{name:"宜昌",date:"10/18",range:"10月18日—10月21日",lng:111.2865,lat:30.6919,stage:1,stay:"3天左右",reason:"从中原切入长江三峡，自驾线路继续向西南推进，同时用游船/观景替代连续徒步。",drive:"洛阳到宜昌以高德实时结果为准；若超过6小时，当天不安排两坝一峡或大坝。",near:[A("三峡大坝—屈原故里旅游区","5A","大坝、坛子岭、185平台等。"),A("三峡人家风景区","5A","峡江山水和民俗结合。"),A("三峡大瀑布旅游区","5A","若不想再坐船，可选此处。")]},
+
+{name:"张家界",date:"10/22",range:"10月22日—10月26日",lng:110.4792,lat:29.3454,stage:2,stay:"约4—5天",reason:"在秋色仍在、天气尚未进入寒冬时看武陵源峰林；多留天数是为了每天只走一部分景区。",drive:"抵达后不要立刻安排整天爬山。武陵源、天门山至少拆成两天。",near:[A("武陵源核心景区","5A","张家界国家森林公园、袁家界、天子山等核心区域。"),A("天门山景区","5A","索道、玻璃栈道等，单独一天更合适。")]},
+{name:"凤凰古城",date:"10/27",range:"10月27日—10月29日",lng:109.5996,lat:27.9483,stage:2,stay:"2—3天",reason:"安排在张家界与恩施之间作为低强度恢复段；清晨和夜景适合拍摄，白天不必密集打卡。",drive:"张家界到凤凰属于较轻松转场，抵达当晚可看夜景。",near:[A("凤凰古城旅游区","5A","沱江、吊脚楼、古城街巷是核心。"),A("矮寨奇观旅游区","5A","如时间充裕，可结合湘西山地景观。")]},
+{name:"恩施",date:"10/30",range:"10月30日—11月2日",lng:109.4882,lat:30.2722,stage:2,stay:"3—4天",reason:"从湘西回到鄂西，再顺路进入重庆；秋末雨水相对少，峡谷能见度通常更友好。",drive:"山区道路较多，七星寨与云龙地缝不要和长途驾驶安排在同一天。",near:[A("恩施大峡谷","5A","七星寨、云龙地缝，属于本段重点。"),A("恩施土司城","4A","市区附近的人文补充，体力要求低。")]},
+
+{name:"重庆",date:"11/03",range:"11月3日—11月6日",lng:106.5516,lat:29.5630,stage:3,stay:"约4天",reason:"新增的城市旅居节点。山城地形、人文街区和夜景与前面自然景观差异很大，也适合作为四川前的休整。",drive:"市区坡多、停车成本高，住下后可减少开车，改用轨道交通。",near:[A("大足石刻景区","5A","世界文化遗产，若愿意自驾郊区可安排一整天。"),A("武隆喀斯特旅游区","5A","天生三桥等，但距离市区较远，需单独一天。"),A("洪崖洞","4A","城市夜景代表，适合晚间。")]},
+{name:"成都",date:"11/07",range:"11月7日—11月8日",lng:104.0665,lat:30.5723,stage:3,stay:"压缩为约2天",reason:"按你的要求缩短成都，只承担美食、休整和九寨沟前的补给作用，把时间优先留给九寨沟、乐山和峨眉山。",drive:"重庆到成都转场后不安排高强度活动；第二天再选1—2个重点。",near:[A("青城山—都江堰旅游景区","5A","如果成都周边只选一个自然人文组合，可优先。"),A("成都大熊猫繁育研究基地","4A","建议早晨去。"),A("三星堆博物馆","其他","博物馆类重点，人文价值高但不以A级标签为核心。")]},
+{name:"九寨沟",date:"11/09",range:"11月9日—11月12日",lng:103.9186,lat:33.2600,stage:3,stay:"约4天",reason:"把九寨沟提前到11月上旬，优先抓彩林尾段；这是整条路线里季节敏感度最高的节点之一。",drive:"成都至九寨沟以实时路况为准。黄龙海拔更高，和长途驾驶不要安排同一天。",near:[A("九寨沟风景名胜区","5A","五花海、诺日朗等，至少安排1个完整日。"),A("黄龙国家级风景名胜区","5A","高海拔，视天气和身体状态决定。")]},
+{name:"成都（中转）",date:"11/13",range:"11月13日",lng:104.0665,lat:30.5723,stage:3,stay:"1晚",reason:"九寨沟返回后的缓冲夜，不再安排成都周边长住，第二天继续向乐山。",drive:"这天以回程、吃饭、补给和睡眠为主。",near:[A("人民公园","其他","若很早抵达，可喝茶散步。"),A("宽窄巷子","其他","适合轻量夜游，不必专程留整天。")]},
+{name:"乐山",date:"11/14",range:"11月14日",lng:103.7656,lat:29.5521,stage:3,stay:"约1天",reason:"新增节点。位于成都向峨眉山南下方向，几乎不需要额外折返；用一天看大佛后直接衔接峨眉。",drive:"成都到乐山较轻松，可当天抵达后游览；若选择游船和步行线路都体验，时间要放宽。",near:[A("乐山大佛景区","5A","核心必看，可选择步行或游船视角。"),A("嘉州古城/苏稽古镇","其他","适合晚间吃饭和轻量散步。")]},
+{name:"峨眉山",date:"11/15",range:"11月15日—11月16日",lng:103.4845,lat:29.6012,stage:3,stay:"约2天",reason:"新增节点。和乐山形成自然组合，又正好位于南下贵州的方向；两天比一天往返更松弛。",drive:"山上温差大，若上金顶建议住景区附近；不要把下山后长途去贵州和高强度登山塞在同一天。",near:[A("峨眉山风景名胜区","5A","金顶、万年寺、报国寺等按体力组合。"),A("报国寺","其他","适合低强度人文游览。")]},
+
+{name:"遵义",date:"11/17",range:"11月17日—11月18日",lng:106.9272,lat:27.7257,stage:4,stay:"1—2天",reason:"把峨眉山到黔东北的长距离拆开，同时作为贵州北部门户；这站可偏休整，不追求密集景点。",drive:"若峨眉山到遵义接近6小时，到达后只安排吃饭和休息。",near:[A("遵义会议会址旅游景区","4A","市区人文重点。"),A("赤水丹霞旅游区","5A","等级高但离遵义市区较远，只有额外留天数才建议去。")]},
+{name:"梵净山",date:"11/19",range:"11月19日—11月21日",lng:108.7070,lat:27.9158,stage:4,stay:"2—3天",reason:"贵州北部代表性自然景观；多留一天是为了给大雾、大风等山区天气留弹性。",drive:"提前看天气和索道开放情况，不为登顶硬等恶劣天气。",near:[A("梵净山旅游区","5A","世界自然遗产，贵州重点自然节点。"),A("亚木沟风景区","4A","梵净山周边可选，体力允许再加。")]},
+{name:"镇远古城",date:"11/22",range:"11月22日—11月24日",lng:108.4237,lat:27.0493,stage:4,stay:"约3天",reason:"从山地切换到古城慢住，降低体力负荷；舞阳河两岸适合早晚散步。",drive:"古城内停车和道路较窄，住宿尽量选择有停车位的位置。",near:[A("镇远古城旅游景区","5A","舞阳河、古街、青龙洞等组成核心体验。"),A("青龙洞古建筑群","其他","全国重点文保性质强，适合人文游。")]},
+{name:"西江千户苗寨",date:"11/25",range:"11月25日—11月27日",lng:108.1767,lat:26.4940,stage:4,stay:"2—3天",reason:"集中体验苗寨夜景、村落和民族文化；安排在镇远到荔波之间，路线连续。",drive:"景区交通和停车有管制，以游客中心换乘为主。",near:[A("西江千户苗寨","4A","观景台、苗寨街巷、夜景。"),A("郎德上寨","4A","规模更小、更安静的苗寨备选。")]},
+{name:"荔波",date:"11/28",range:"11月28日—11月30日",lng:107.8860,lat:25.4100,stage:4,stay:"约3天",reason:"喀斯特水景是贵州段的重要变化，冬季游客较少；结束后向贵阳/安顺移动。",drive:"大小七孔景区内部游览时间长，安排完整一天。",near:[A("荔波樟江景区（大小七孔）","5A","贵州代表性喀斯特水景。"),A("茂兰国家级自然保护区","其他","世界自然遗产组成部分，偏生态体验。")]},
+{name:"贵阳",date:"12/01",range:"12月1日—12月3日",lng:106.6302,lat:26.6470,stage:4,stay:"约3天",reason:"贵州段中途休整、补给、洗衣剪片；同时有适合轻松游览的古镇和城市公园。",drive:"城市段减少开车频率，避免拥堵。",near:[A("青岩古镇景区","5A","贵阳代表性古镇。"),A("天河潭旅游度假区","4A","喀斯特景观和休闲结合。"),A("黔灵山公园","4A","市区轻量游览。")]},
+{name:"黄果树",date:"12/04",range:"12月4日—12月6日",lng:105.6670,lat:25.9950,stage:4,stay:"约3天",reason:"贵州段收尾节点；冬季水量较夏季小，但游客更少，之后从安顺方向自然进入云南。",drive:"天星桥等步行量不小，主瀑和天星桥可分配节奏。",near:[A("黄果树瀑布景区","5A","主瀑、陡坡塘、天星桥组成核心。"),A("龙宫风景名胜区","5A","安顺周边另一5A，可视体力二选一。")]},
+
+{name:"昆明",date:"12/07",range:"12月7日—12月9日",lng:102.8329,lat:24.8801,stage:5,stay:"约3天",reason:"进入云南后的气候适应和补给站，之后开始大理、丽江的长住段。",drive:"贵州进入昆明若接近6小时，当天只入住休息。",near:[A("石林风景区","5A","昆明代表性喀斯特景观。"),A("云南民族村","4A","适合轻松半日。"),A("滇池/海埂大坝","其他","冬季观鸥体验突出。")]},
+{name:"大理",date:"12/10",range:"12月10日—12月16日",lng:100.2676,lat:25.6065,stage:5,stay:"约7天",reason:"全程重点慢旅居节点之一，用一周降低旅行强度，也方便环洱海、古城、喜洲分天体验。",drive:"环洱海不要追求一天全部打卡，西岸生态廊道更适合慢走。",near:[A("崇圣寺三塔文化旅游区","5A","大理明确的5A代表。"),A("大理古城","4A","适合早晚慢逛。"),A("洱海生态廊道","其他","慢骑、散步和拍摄都适合。")]},
+{name:"丽江",date:"12/17",range:"12月17日—12月23日",lng:100.2330,lat:26.8721,stage:5,stay:"约7天",reason:"冬季晴天概率较高，安排较长时间用于古城、束河、雪山和休息，不把玉龙雪山硬塞进固定日期。",drive:"玉龙雪山要根据天气和预约决定；高海拔活动后不建议立刻长途驾驶。",near:[A("丽江古城","5A","世界文化遗产，适合早晚避开高峰。"),A("玉龙雪山景区","5A","根据天气和预约情况安排。"),A("束河古镇","其他","比大研古城更适合安静慢住。")]},
+{name:"楚雄",date:"12/24",range:"12月24日",lng:101.5460,lat:25.0410,stage:5,stay:"中转1晚",reason:"主要用于拆分丽江到建水/元阳方向的长途驾驶，不需要为了景点增加很多时间。",drive:"把它当作驾驶缓冲站，到达后轻松吃饭即可。",near:[A("彝人古镇","4A","中转夜可轻松逛。"),A("楚雄州博物馆","4A","如到达较早，可作为人文补充。")]},
+{name:"建水",date:"12/25",range:"12月25日—12月27日",lng:102.8266,lat:23.6346,stage:5,stay:"约3天",reason:"既拆分云南南下驾驶，也本身值得停留；古城、米轨小火车和传统民居适合慢游。",drive:"古城内部尽量步行，车辆留在住宿或外围停车区域。",near:[A("朱家花园","4A","建水传统民居代表。"),A("建水文庙","4A","人文核心之一。"),A("学政考棚","4A","适合和古城步行串联。"),A("团山古村","4A","可与米轨小火车结合。")]},
+{name:"元阳梯田",date:"12/28",range:"12月28日—12月31日",lng:102.7440,lat:23.1580,stage:5,stay:"约4天",reason:"刻意跨到年末，尽量贴近1月的灌水梯田、云海和晨昏光影窗口；多留几天提升遇到好天气的概率。",drive:"观景台之间多山路，日出和日落驾驶注意雾气；不要疲劳追点。",near:[A("元阳哈尼梯田景区","4A","世界文化遗产核心区，摄影重点。"),A("多依树梯田","其他","日出常用观景点。"),A("坝达梯田","其他","日落和大尺度梯田景观。")]},
+{name:"西双版纳",date:"01/01",range:"1月1日—1月4日",lng:100.7979,lat:22.0017,stage:5,stay:"约4天",reason:"进入全程最温暖的一段，用于彻底避寒和恢复；从这里开始准备向广西、海南转向。",drive:"景洪市区和植物园距离不近，植物园单独一天。",near:[A("中国科学院西双版纳热带植物园","5A","热带植物和科普重点。"),A("曼听公园","4A","景洪市区内较方便。"),A("野象谷","4A","自然生态类，可视兴趣选择。")]},
+
+{name:"砚山中转",date:"01/05",range:"1月5日",lng:104.3370,lat:23.6050,stage:6,stay:"纯中转1晚",reason:"专门把西双版纳到广西的超长距离拆成两段，服务你“单日尽量不超过6小时”的原则。",drive:"当天主要任务就是驾驶和休息，不安排远距离景点。",near:[A("普者黑景区","其他","如果后续愿意额外加1天，可从砚山方向前往；本计划不强塞。")]},
+{name:"百色",date:"01/06",range:"1月6日",lng:106.6184,lat:23.9020,stage:6,stay:"中转1晚",reason:"云南进入桂西后的缓冲点，为靖西和德天段减少单日驾驶压力。",drive:"抵达后以休息为主。",near:[A("百色起义纪念园","5A","若较早到达可选。"),A("百色城区","其他","主要承担补给和住宿功能。")]},
+{name:"靖西",date:"01/07",range:"1月7日—1月8日",lng:106.4175,lat:23.1340,stage:6,stay:"约2天",reason:"桂西山水的代表节点，和德天瀑布处于同一条向东南推进的路线，不需要折返。",drive:"县域山路和景点分散，控制每天景点数量。",near:[A("通灵大峡谷","4A","瀑布、峡谷、植被为主。"),A("古龙山大峡谷","4A","峡谷和水景体验。"),A("鹅泉","4A","更轻松的田园水景。")]},
+{name:"德天瀑布",date:"01/09",range:"1月9日",lng:106.7350,lat:22.8588,stage:6,stay:"约1天",reason:"广西西南段最重要的自然节点，随后顺着崇左、南宁向北海移动。",drive:"边境景区按当日开放和证件要求执行，不把跨境项目视为必做。",near:[A("德天跨国瀑布景区","5A","广西西南核心自然景点。"),A("明仕田园","4A","喀斯特田园景观，适合低强度游览。")]},
+{name:"崇左",date:"01/10",range:"1月10日",lng:107.3647,lat:22.3765,stage:6,stay:"1晚",reason:"德天之后向南宁过渡，降低连续驾驶强度，也可体验边关人文。",drive:"主要作为顺路节点，景点只选一个即可。",near:[A("左江花山岩画文化景观","其他","世界文化遗产，人文价值高。"),A("太平古城","其他","适合夜间轻松散步。")]},
+{name:"南宁",date:"01/11",range:"1月11日",lng:108.3665,lat:22.8170,stage:6,stay:"1晚",reason:"进入北海前的城市休整和补给，避免广西段每天都在山地景区。",drive:"城市停车和高峰拥堵注意避开。",near:[A("青秀山风景旅游区","5A","南宁代表性城市山水景区。"),A("南宁园博园","4A","时间充裕可选。")]},
+{name:"北海",date:"01/12",range:"1月12日—1月13日",lng:109.1193,lat:21.4733,stage:6,stay:"约2天",reason:"在进入海南前先安排海滨缓冲；如果不去涠洲岛，两天足够慢逛银滩和老街。",drive:"不建议为了打卡临时把涠洲岛塞进1天，坐船会打乱海南时间。",near:[A("北海银滩旅游区","4A","城市海滨核心。"),A("北海老街","4A","骑楼街区，适合傍晚。"),A("涠洲岛","其他","若以后单独增加2—3天再去更合适。")]},
+{name:"徐闻港",date:"01/14",range:"1月14日",lng:110.2100,lat:20.3750,stage:6,stay:"轮渡前1晚",reason:"把北海到海南的公路驾驶与轮渡拆开，避免一天同时长驾和过海。",drive:"轮渡日的排队、安检、待渡都算交通时间；本节点不安排景点。",near:[A("菠萝的海","其他","若很早抵达可顺路，但不作为必去。")]},
+
+{name:"海口",date:"01/15",range:"1月15日",lng:110.1983,lat:20.0440,stage:7,stay:"1晚",reason:"车辆过海后的第一晚只做落地休息，再从第二天开始海南东线。",drive:"下船时间不稳定，不安排需要预约的大景点。",near:[A("雷琼海口火山群世界地质公园","4A","地质景观，时间足够再去。"),A("骑楼老街","其他","适合晚上吃饭散步。")]},
+{name:"文昌",date:"01/16",range:"1月16日",lng:110.7977,lat:19.5434,stage:7,stay:"1晚",reason:"海南东线第一站，从海口顺路向东南，不折返。",drive:"海口到文昌车程较短，可正常游玩。",near:[A("海南铜鼓岭景区","4A","山海结合，文昌代表性景点。"),A("文昌航天相关参观点","其他","是否开放和参观方式以当期公告为准。")]},
+{name:"万宁",date:"01/17",range:"1月17日",lng:110.3911,lat:18.7951,stage:7,stay:"1晚",reason:"海南东线最适合公路景观和海湾停留的一段，安排为轻松海边日。",drive:"沿海公路容易走走停停，留足白天时间，不追求多点打卡。",near:[A("兴隆热带植物园","4A","热带植物体验。"),A("东山岭文化旅游区","4A","山海与人文结合。"),A("日月湾","其他","适合看海和慢走。")]},
+{name:"陵水",date:"01/18",range:"1月18日",lng:110.0372,lat:18.5050,stage:7,stay:"1晚",reason:"连接万宁和三亚，顺路加入优质海岛/海湾景观。",drive:"如果去分界洲岛，需要把登岛、候船时间算进去。",near:[A("分界洲岛旅游区","5A","海南代表性海岛5A景区。"),A("南湾猴岛生态旅游区","4A","可与清水湾方向组合。")]},
+{name:"三亚",date:"01/19",range:"1月19日",lng:109.5119,lat:18.2528,stage:7,stay:"1个完整日",reason:"海南最南端节点。受总工期限制这里不长住，把重点放在1—2个代表景点和海边休息。",drive:"不要一天同时塞南山、天涯海角、蜈支洲岛；只选最感兴趣的一类。",near:[A("天涯海角游览区","5A","三亚代表性滨海人文景观。"),A("蜈支洲岛旅游区","5A","海岛类重点。"),A("南山文化旅游区","5A","人文佛教类重点。")]},
+{name:"海口（返程）",date:"01/20",range:"1月20日",lng:110.1983,lat:20.0440,stage:7,stay:"返程过海前1晚",reason:"从三亚北上，把过海和长途北返拆开；不在这天继续赶往广西。",drive:"三亚到海口以高速为主，到达后休息、检查车辆、确认次日轮渡。",near:[A("骑楼老街","其他","只作为轻松晚餐散步。")]},
+
+{name:"徐闻港（返程）",date:"01/21",range:"1月21日",lng:110.2100,lat:20.3750,stage:8,stay:"轮渡交通节点",reason:"从海南回大陆，继续北上广西桂林方向。",drive:"轮渡耗时不稳定，当天原则上只安排过海和短距离移动。",near:[A("徐闻港","其他","交通节点，不作为旅游景区。")]},
+{name:"湛江",date:"01/21",range:"1月21日",lng:110.3594,lat:21.2707,stage:8,stay:"过海后1晚",reason:"过海后立刻休息，避免再连续开五六小时。",drive:"轮渡已经消耗精力，当天不再安排长途。",near:[A("湖光岩风景区","4A","若轮渡很早且状态好可选；否则不去。")]},
+{name:"梧州",date:"01/22",range:"1月22日",lng:111.2791,lat:23.4769,stage:8,stay:"中转1晚",reason:"把湛江到阳朔拆成两天，严格服务于单日驾驶尽量≤6小时。",drive:"到达后只吃饭休息，第二天再进阳朔。",near:[A("梧州骑楼城","其他","抵达早可夜间散步。"),A("龙母庙","其他","人文景点，可选。")]},
+{name:"阳朔",date:"01/23",range:"1月23日—1月24日",lng:110.4966,lat:24.7785,stage:8,stay:"约2天",reason:"按你的要求新增，并放到海南后的北返路径上，避免南下时先绕到桂林再折回海南。",drive:"梧州到阳朔为中等距离转场，第一晚以西街/河边散步为主，完整游玩放第二天。",near:[A("桂林漓江景区","5A","兴坪段是阳朔方向的精华体验之一。"),A("遇龙河景区","4A","适合竹筏、骑行和慢游。"),A("世外桃源景区","4A","时间充裕可选。")]},
+{name:"桂林",date:"01/25",range:"1月25日",lng:110.2900,lat:25.2736,stage:8,stay:"约1天",reason:"阳朔之后继续北上，桂林市区只保留一天，把更多时间让给阳朔和返京驾驶。",drive:"阳朔到桂林距离短，当天可以正常游览。",near:[A("两江四湖·象山景区","5A","桂林城市山水核心。"),A("独秀峰·王城景区","5A","人文与山水结合。"),A("桂林漓江景区","5A","如阳朔段已体验，可不重复。")]},
+{name:"衡阳",date:"01/26",range:"1月26日",lng:112.5719,lat:26.8932,stage:8,stay:"中转1晚",reason:"把桂林到北京拆成连续短段北上；返程以安全和准时为第一优先。",drive:"当天主要驾驶。如果高德显示余量很大，再决定是否顺路看景点。",near:[A("南岳衡山旅游区","5A","等级高，但返程时间紧，不建议临时深度游。")]},
+{name:"岳阳",date:"01/27",range:"1月27日",lng:113.1289,lat:29.3571,stage:8,stay:"中转1晚",reason:"继续北上拆分驾驶时间；若到得早，可用一个轻量人文景点作为返程调剂。",drive:"以抵达时间决定是否游览，绝不为了景点夜间疲劳驾驶。",near:[A("岳阳楼—君山岛景区","5A","若只选一个，优先岳阳楼。")]},
+{name:"信阳",date:"01/28",range:"1月28日",lng:114.0911,lat:32.1486,stage:8,stay:"中转1晚",reason:"湖南进入河南后的自然分段点，保证后面郑州、石家庄每天驾驶时间可控。",drive:"返程节点只承担住宿与补给。",near:[A("鸡公山景区","其他","若以后单独安排信阳游可考虑；本次不建议临时绕行。")]},
+{name:"郑州",date:"01/29",range:"1月29日",lng:113.6254,lat:34.7466,stage:8,stay:"中转1晚",reason:"返京前的河南中转站，继续保持每天驾驶不过量。",drive:"不进入复杂景区，优先住宿位置和第二天出城便利。",near:[A("嵩山少林景区","5A","不在此次返程强塞，如专程玩至少需半天以上。"),A("河南博物院","其他","城市人文备选。")]},
+{name:"石家庄",date:"01/30",range:"1月30日",lng:114.5149,lat:38.0428,stage:8,stay:"最后中转1晚",reason:"让最后一天到北京只剩较短车程，同时为冬季天气或高速延误留下缓冲。",drive:"检查次日北京方向天气与高速情况，早点休息。",near:[A("西柏坡景区","5A","不建议返程当天绕行，留作以后单独安排。"),A("正定古城","其他","若到达较早可轻松吃饭散步。")]},
+{name:"北京（返京）",date:"01/31",range:"1月31日前后",lng:116.4074,lat:39.9042,stage:8,stay:"行程结束",reason:"按目标在春节前返京，并预留一定天气与交通缓冲。",drive:"石家庄到北京以实时路况为准；冬季注意雾、雪、结冰。",near:[A("返京","其他","结束约110天的大环线。")]}
+];
+
+let AMapObj=null,map=null,routePolyline=null,markers=[],segmentLines=[],hitLines=[],activeDetail=-1;
+let segData=new Array(R.length-1).fill(null);
+const cacheKey="amap_roadtrip_mobile_v5";
+try{
+  const c=JSON.parse(localStorage.getItem(cacheKey)||"null");
+  if(Array.isArray(c)&&c.length===segData.length)segData=c;
+}catch(e){}
+const $=id=>document.getElementById(id);
+$("statStops").textContent=R.length;$("segCount").textContent=(R.length-1)+" 段";
+
+function classify(sec){
+  if(!Number.isFinite(sec))return {c:"",t:"未计算"};
+  const h=sec/3600;
+  if(h>6)return {c:"danger",t:">6h · 纯赶路日"};
+  if(h>=5)return {c:"warn",t:"5–6h · 到达后休息"};
+  return {c:"ok",t:"≤5h · 可轻量活动"};
+}
+function fmtTime(sec){
+  if(!Number.isFinite(sec))return "--";
+  const h=Math.floor(sec/3600),m=Math.round(sec%3600/60);
+  return `${h}小时${m?m+"分":""}`;
+}
+function fmtKm(m){return Number.isFinite(m)?Math.round(m/1000)+" km":"--"}
+function levelClass(level){return level==="5A"?"a5":level==="4A"?"a4":"other"}
+
+function renderStops(){
+  $("stages").innerHTML="";
+  Object.keys(STAGES).forEach(k=>{
+    const st=STAGES[k],wrap=document.createElement("div");wrap.className="stage";
+    wrap.innerHTML=`<div class="stage-head"><i class="stage-c" style="background:${st.c}"></i>${k}. ${st.name}</div>`;
+    R.forEach((p,i)=>{
+      if(String(p.stage)!==String(k))return;
+      const el=document.createElement("div");el.className="stop";
+      el.innerHTML=`<div class="date-chip" style="background:${st.c}">${p.date}</div>
+      <div><div class="stop-name">${p.name}</div><div class="stop-sub">${p.stay}</div></div>
+      <span class="badge">${p.transit?"中转":"详情"}</span>`;
+      el.onclick=()=>openDetail(i);
+      wrap.appendChild(el);
+    });
+    $("stages").appendChild(wrap);
+  });
+}
+function renderSegments(){
+  $("segments").innerHTML="";
+  segData.forEach((d,i)=>{
+    const c=d?classify(d.time):classify(NaN);
+    const el=document.createElement("div");el.className="seg";
+    el.innerHTML=`<div class="seg-top"><div class="seg-route">${R[i].date} ${R[i].name} → ${R[i+1].date} ${R[i+1].name}</div>
+      <button class="btn ghost" ${map?"":"disabled"}>真实路线</button></div>
+      <div class="meta"><span class="pill">${d?fmtKm(d.distance):"里程未算"}</span>
+      <span class="pill">${d?fmtTime(d.time):"时长未算"}</span><span class="pill ${c.c}">${c.t}</span></div>`;
+    el.querySelector("button").onclick=()=>planOne(i,true);
+    $("segments").appendChild(el);
+  });
+  updateTotals();
+}
+function updateTotals(){
+  let d=0,t=0,n=0;segData.forEach(x=>{if(x){d+=x.distance||0;t+=x.time||0;n++}});
+  $("statKm").textContent=n?Math.round(d/1000).toLocaleString()+" km":"--";
+  $("statHours").textContent=n?Math.round(t/3600)+" h":"--";
+}
+function renderMobile(){
+  $("nodeStrip").innerHTML="";
+  $("mobileListItems").innerHTML="";
+  R.forEach((p,i)=>{
+    const st=STAGES[p.stage];
+    const mini=document.createElement("button");mini.className="node-mini";
+    mini.innerHTML=`<b>${p.date} · ${p.name}</b><span>${p.stay}</span>`;
+    mini.onclick=()=>openDetail(i);$("nodeStrip").appendChild(mini);
+    const row=document.createElement("div");row.className="ml-item";
+    row.innerHTML=`<div class="ml-date" style="background:${st.c}">${p.date}</div>
+      <div><div class="ml-name">${p.name}</div><div class="ml-sub">${p.range} · ${p.stay}</div></div><span class="badge">查看</span>`;
+    row.onclick=()=>{closeMobileList();openDetail(i)};$("mobileListItems").appendChild(row);
+  });
+}
+renderStops();renderSegments();renderMobile();
+
+function openDetail(i){
+  activeDetail=i;const p=R[i],st=STAGES[p.stage];
+  $("detailHero").style.background=`linear-gradient(145deg,#0f172a,${st.c})`;
+  $("detailDate").textContent=p.range;
+  $("detailName").textContent=p.name;
+  $("detailStay").textContent=p.stay;
+  $("detailReason").textContent=p.reason;
+  $("detailDrive").textContent=p.drive;
+  $("detailAttractions").innerHTML=(p.near||[]).map(x=>`<div class="attraction">
+    <div class="attr-top"><div class="attr-name">${x.name}</div><span class="level ${levelClass(x.level)}">${x.level}</span></div>
+    <div class="attr-note">${x.note}</div></div>`).join("");
+  $("prevBtn").disabled=i===0;$("nextBtn").disabled=i===R.length-1;$("routeFromHereBtn").disabled=i===R.length-1||!map;
+  $("detailOverlay").classList.add("open");
+  if(window.innerWidth<=900 && !history.state?.detail) history.pushState({detail:true},"","#detail");
+}
+function closeDetail(fromPop=false){
+  $("detailOverlay").classList.remove("open");activeDetail=-1;
+  if(!fromPop && window.innerWidth<=900 && history.state?.detail) history.back();
+}
+$("detailBackBtn").onclick=()=>closeDetail(false);
+$("prevBtn").onclick=()=>{if(activeDetail>0)openDetail(activeDetail-1)};
+$("nextBtn").onclick=()=>{if(activeDetail<R.length-1)openDetail(activeDetail+1)};
+$("routeFromHereBtn").onclick=()=>{const i=activeDetail;closeDetail(false);setTimeout(()=>planOne(i,true),100)};
+window.addEventListener("popstate",()=>{if($("detailOverlay").classList.contains("open"))closeDetail(true)});
+
+function openMobileList(){$("mobileList").classList.add("open")}
+function closeMobileList(){$("mobileList").classList.remove("open")}
+$("mobileListBtn").onclick=openMobileList;$("closeListBtn").onclick=closeMobileList;
+
+function setStatus(t,p=0){$("status").textContent=t;$("bar").style.width=Math.max(0,Math.min(100,p))+"%"}
+const dlg=$("dlg");
+let amapBooting=false;
+
+/*
+ * 高德凭据读取优先级：
+ * 1. 宿主/后端预先注入 window.__AMAP_PAYLOAD__
+ *    window.__AMAP_PAYLOAD__ = {
+ *      amapKey: "YOUR_WEB_KEY",
+ *      securityJsCode: "YOUR_SECURITY_JSCODE"
+ *    };
+ *
+ * 2. URL 参数：
+ *    ?amapKey=YOUR_WEB_KEY&securityJsCode=YOUR_SECURITY_JSCODE
+ *
+ * 3. 本浏览器 localStorage
+ * 4. 都没有时才弹出网页输入框
+ *
+ * 注意：纯静态 HTML 无法直接读取导航请求的 HTTP POST body。
+ * 如果你的后端接收 JSON body，请把 body 注入为 window.__AMAP_PAYLOAD__。
+ */
+function normalizeCredentials(obj){
+  if(!obj || typeof obj!=="object")return null;
+  const key=String(obj.amapKey ?? obj.key ?? "").trim();
+  const sec=String(obj.securityJsCode ?? obj.securityCode ?? obj.sec ?? "").trim();
+  return key&&sec?{key,sec}:null;
+}
+function credentialsFromInjectedPayload(){
+  return normalizeCredentials(window.__AMAP_PAYLOAD__ || window.AMAP_PAYLOAD || null);
+}
+function credentialsFromUrl(){
+  try{
+    const q=new URLSearchParams(location.search);
+    const direct=normalizeCredentials({
+      amapKey:q.get("amapKey")||q.get("key"),
+      securityJsCode:q.get("securityJsCode")||q.get("securityCode")||q.get("sec")
+    });
+    if(direct)return direct;
+
+    // 同时支持 hash 参数，避免 Key 出现在服务器访问日志：
+    // #amapKey=xxx&securityJsCode=yyy
+    const hash=(location.hash||"").replace(/^#/,"");
+    if(hash){
+      const h=new URLSearchParams(hash);
+      return normalizeCredentials({
+        amapKey:h.get("amapKey")||h.get("key"),
+        securityJsCode:h.get("securityJsCode")||h.get("securityCode")||h.get("sec")
+      });
+    }
+  }catch(e){console.warn("读取 URL 高德参数失败",e)}
+  return null;
+}
+function credentialsFromLocal(){
+  try{
+    return normalizeCredentials({
+      amapKey:localStorage.getItem("amap_key"),
+      securityJsCode:localStorage.getItem("amap_sec")
+    });
+  }catch(e){return null}
+}
+function resolveAmapCredentials(){
+  const injected=credentialsFromInjectedPayload();
+  if(injected)return {...injected,source:"请求/注入载荷"};
+  const urlCred=credentialsFromUrl();
+  if(urlCred)return {...urlCred,source:"URL载荷"};
+  const localCred=credentialsFromLocal();
+  if(localCred)return {...localCred,source:"浏览器缓存"};
+  return null;
+}
+function saveCredentials(c){
+  try{
+    localStorage.setItem("amap_key",c.key);
+    localStorage.setItem("amap_sec",c.sec);
+  }catch(e){}
+}
+function openDlg(){
+  const cached=credentialsFromLocal();
+  $("keyInput").value=cached?.key||"";
+  $("secInput").value=cached?.sec||"";
+  if(!dlg.open)dlg.showModal();
+}
+async function bootstrapAmap(promptIfMissing=true){
+  if(map || amapBooting)return;
+  const c=resolveAmapCredentials();
+  if(!c){
+    setStatus("未检测到预设高德 Key，请在网页端输入。",0);
+    if(promptIfMissing)openDlg();
+    return;
+  }
+  amapBooting=true;
+  saveCredentials(c);
+  setStatus(`检测到${c.source}，正在自动加载高德地图…`,8);
+  try{
+    await initMap(c.key,c.sec,c.source);
+  }finally{
+    amapBooting=false;
+  }
+}
+$("loadBtn").onclick=()=>bootstrapAmap(true);
+$("placeholderBtn").onclick=()=>bootstrapAmap(true);
+$("cancelBtn").onclick=()=>dlg.close();
+$("okBtn").onclick=async()=>{
+  const c=normalizeCredentials({
+    amapKey:$("keyInput").value,
+    securityJsCode:$("secInput").value
+  });
+  if(!c){alert("请同时填写 Web 端 Key 和 securityJsCode");return}
+  saveCredentials(c);
+  dlg.close();
+  if(!map){
+    amapBooting=true;
+    try{await initMap(c.key,c.sec,"网页输入")}finally{amapBooting=false}
+  }
+};
+function loadLoader(){
+  return new Promise((resolve,reject)=>{
+    if(window.AMapLoader)return resolve();
+    const s=document.createElement("script");s.src="https://webapi.amap.com/loader.js";
+    s.onload=resolve;s.onerror=()=>reject(new Error("高德 Loader 加载失败"));document.head.appendChild(s);
+  });
+}
+async function initMap(key,sec,credentialSource="高德凭据"){
+  try{
+    setStatus("正在加载高德地图…",15);
+    window._AMapSecurityConfig={securityJsCode:sec};
+    await loadLoader();
+    AMapObj=await AMapLoader.load({key,version:"2.0",plugins:["AMap.Scale","AMap.ToolBar","AMap.Driving"]});
+    map=new AMapObj.Map("map",{zoom:4,center:[105,30],viewMode:"2D",dragEnable:true,touchZoom:true,zoomEnable:true});
+    map.addControl(new AMapObj.Scale());
+    if(window.innerWidth>900)map.addControl(new AMapObj.ToolBar({position:{right:"15px",bottom:"35px"}}));
+    drawOverview();
+    $("placeholder").style.display="none";$("mapInfo").style.display="block";$("mapTools").style.display="flex";
+    $("state").textContent="已连接";$("state").style.background="#dcfce7";$("state").style.color="#166534";
+    $("allBtn").disabled=false;$("fitBtn").disabled=false;$("mobileAllBtn").disabled=false;$("mobileFitBtn").disabled=false;
+    renderSegments();
+    setStatus(`已通过${credentialSource}加载：${R.length} 个日期节点。虚线路段可直接点击进行真实算路。`,100);
+    setTimeout(()=>$("bar").style.width="0",800);
+  }catch(e){
+    console.error(e);$("state").textContent="加载失败";setStatus("地图加载失败："+(e.message||e),0);
+    alert("高德地图加载失败，请检查 Key、securityJsCode 和域名白名单。");
+  }
+}
+function markerHtml(p,i){
+  const c=STAGES[p.stage].c,extra=(i===0||i===R.length-1)?" startend":"";
+  return `<div class="map-marker${extra}" style="background:${c}">${p.date}</div>`;
+}
+function drawOverview(){
+  clearOverview();
+  R.forEach((p,i)=>{
+    const m=new AMapObj.Marker({position:[p.lng,p.lat],content:markerHtml(p,i),offset:new AMapObj.Pixel(-22,-14),zIndex:120+i,title:`${p.date} ${p.name}`});
+    m.on("click",()=>openDetail(i));markers.push(m);
+  });
+  map.add(markers);
+  for(let i=0;i<R.length-1;i++){
+    const path=[[R[i].lng,R[i].lat],[R[i+1].lng,R[i+1].lat]];
+    const visible=new AMapObj.Polyline({path,strokeColor:STAGES[R[i].stage].c,strokeOpacity:.7,strokeWeight:4,strokeStyle:"dashed",zIndex:35,cursor:"pointer"});
+    const hit=new AMapObj.Polyline({path,strokeColor:"#2563eb",strokeOpacity:.01,strokeWeight:24,zIndex:55,cursor:"pointer"});
+    visible.on("click",()=>planOne(i,true));hit.on("click",()=>planOne(i,true));
+    segmentLines.push(visible);hitLines.push(hit);
+  }
+  map.add(segmentLines);map.add(hitLines);fitAll();
+}
+function clearOverview(){
+  if(!map)return;
+  [...markers,...segmentLines,...hitLines].forEach(x=>{try{map.remove(x)}catch(e){}});
+  markers=[];segmentLines=[];hitLines=[];
+}
+function overviewVisible(v){
+  segmentLines.forEach(x=>v?x.show():x.hide());hitLines.forEach(x=>v?x.show():x.hide());
+}
+function clearRoute(){
+  if(routePolyline){try{map.remove(routePolyline)}catch(e){}routePolyline=null}
+  $("routeResult").style.display="none";
+}
+function fitAll(){if(map&&markers.length)map.setFitView(markers,false,[70,70,100,70],4)}
+function showOverview(){
+  clearRoute();overviewVisible(true);markers.forEach(x=>x.show());fitAll();
+  $("mapTitle").textContent="全程路线";$("mapText").textContent="节点数字为到达日期；点击节点看二级详情，点击虚线路段看高德真实路线。";
+}
+$("fitBtn").onclick=showOverview;$("mobileFitBtn").onclick=showOverview;$("backMapBtn").onclick=showOverview;
+
+function drivingSearch(i){
+  return new Promise((resolve,reject)=>{
+    const drv=new AMapObj.Driving({policy:AMapObj.DrivingPolicy.LEAST_TIME,showTraffic:false});
+    const a=new AMapObj.LngLat(R[i].lng,R[i].lat),b=new AMapObj.LngLat(R[i+1].lng,R[i+1].lat);
+    drv.search(a,b,(status,result)=>{
+      if(status==="complete"&&result&&result.routes&&result.routes.length){
+        const rr=result.routes[0];resolve({distance:Number(rr.distance),time:Number(rr.time),route:rr});
+      }else reject(new Error(`高德驾车规划未返回路线（${status}）`));
+    });
+  });
+}
+function extractPath(route){
+  const out=[];
+  (route.steps||[]).forEach(step=>{
+    (step.path||[]).forEach(pt=>{
+      const lng=typeof pt.getLng==="function"?pt.getLng():pt.lng;
+      const lat=typeof pt.getLat==="function"?pt.getLat():pt.lat;
+      if(Number.isFinite(lng)&&Number.isFinite(lat))out.push([lng,lat]);
+    });
+  });
+  return out;
+}
+async function planOne(i,show=true){
+  if(!map){bootstrapAmap(true);return}
+  if(i<0||i>=R.length-1)return;
+  setStatus(`正在请求高德真实路线：${R[i].name} → ${R[i+1].name}`,35);
+  $("mapTitle").textContent=`${R[i].date} ${R[i].name} → ${R[i+1].date} ${R[i+1].name}`;
+  $("mapText").textContent="正在计算实际道路路线…";
+  try{
+    const x=await drivingSearch(i);
+    segData[i]={distance:x.distance,time:x.time};localStorage.setItem(cacheKey,JSON.stringify(segData));renderSegments();
+    const path=extractPath(x.route);
+    clearRoute();overviewVisible(false);markers.forEach(x=>x.hide());
+    if(show&&path.length>1){
+      routePolyline=new AMapObj.Polyline({path,strokeColor:"#2563eb",strokeOpacity:.95,strokeWeight:7,strokeStyle:"solid",showDir:true,zIndex:90,lineJoin:"round"});
+      map.add(routePolyline);map.setFitView([routePolyline],false,[70,40,150,40],10);
+    }else{
+      markers[i].show();markers[i+1].show();
+    }
+    const c=classify(x.time);
+    $("mapText").textContent=`${fmtKm(x.distance)} · ${fmtTime(x.time)} · ${c.t}`;
+    $("rrTitle").textContent=`${R[i].name} → ${R[i+1].name}`;
+    $("rrMeta").textContent=`高德实际驾车：${fmtKm(x.distance)} · ${fmtTime(x.time)}`;
+    $("rrTip").textContent=c.t;$("rrTip").style.color=c.c==="danger"?"#b91c1c":c.c==="warn"?"#b45309":"#15803d";
+    $("routeResult").style.display="block";
+    setStatus(`已完成：${R[i].name} → ${R[i+1].name}｜${fmtKm(x.distance)}｜${fmtTime(x.time)}`,100);
+    setTimeout(()=>$("bar").style.width="0",700);
+  }catch(e){
+    console.error(e);showOverview();setStatus(e.message||"规划失败",0);
+    $("routeResult").style.display="block";$("rrTitle").textContent=`${R[i].name} → ${R[i+1].name}`;
+    $("rrMeta").textContent="高德未返回可绘制的驾车路线。轮渡跨海段尤其可能出现这种情况。";
+    $("rrTip").textContent="该段按纯交通日处理";$("rrTip").style.color="#b91c1c";
+  }
+}
+async function calcAll(){
+  if(!map){bootstrapAmap(true);return}
+  $("allBtn").disabled=true;$("mobileAllBtn").disabled=true;
+  let ok=0,fail=0;
+  for(let i=0;i<R.length-1;i++){
+    if(segData[i]){ok++;continue}
+    setStatus(`批量计算 ${i+1}/${R.length-1}：${R[i].name} → ${R[i+1].name}`,Math.round(i/(R.length-1)*100));
+    try{
+      const x=await drivingSearch(i);segData[i]={distance:x.distance,time:x.time};ok++;
+      localStorage.setItem(cacheKey,JSON.stringify(segData));renderSegments();
+    }catch(e){fail++}
+    await new Promise(r=>setTimeout(r,240));
+  }
+  $("allBtn").disabled=false;$("mobileAllBtn").disabled=false;
+  setStatus(`批量计算完成：成功 ${ok} 段，失败 ${fail} 段。超过6小时的段落会标红。`,100);
+  setTimeout(()=>$("bar").style.width="0",900);
+}
+$("allBtn").onclick=calcAll;$("mobileAllBtn").onclick=calcAll;
+
+
+// 页面进入时自动尝试：载荷 → URL → localStorage；都没有才询问
+window.addEventListener("DOMContentLoaded",()=>{
+  setTimeout(()=>bootstrapAmap(true),0);
+});
+
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"7939e04a4baf43c8b86a560f74aac60e","spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
