@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
-<title>DSC Curve Studio · 曲线识别、分割与合并</title>
+<title>Lab Data Studio · DSC / 流变 / 通用实验数据处理</title>
 <style>
 :root{--bg:#f5f7fc;--surface:#fff;--ink:#19253d;--muted:#65738b;--border:#e2e7f1;--blue:#3758d7;--blue-dark:#2444b9;--light-blue:#edf2ff;--purple:#7e62d5;--good:#167e65;--warning:#ae7325;--shadow:0 9px 32px rgba(27,43,93,.065);--radius:18px}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
@@ -14,29 +14,45 @@ button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,inpu
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}.pad{padding:23px}.ingest-grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(285px,.75fr);gap:17px}.drop{border:1.7px dashed #b5c4e9;background:linear-gradient(135deg,#f9fbff,#f2f6ff);border-radius:15px;min-height:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px;transition:background .15s,border-color .15s;cursor:pointer}.drop.dragover{background:#e8efff;border-color:#4f74e7}.drop .drop-icon{display:grid;place-items:center;width:44px;height:44px;background:#e3ebff;border-radius:13px;color:var(--blue);font-size:22px;font-weight:800}.drop strong{font-size:15px}.drop span{color:var(--muted);font-size:12px}.file-options{display:flex;flex-wrap:wrap;gap:15px;align-items:center;justify-content:space-between;margin-top:14px}.control{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted)}select,.search{color:var(--ink);background:#fff;border:1px solid #d9e1ef;border-radius:9px;padding:8px 11px;min-height:36px}.search{width:100%;max-width:255px}.btn{border:none;border-radius:10px;padding:9px 15px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:37px;transition:transform .1s,background .15s}.btn:active{transform:translateY(1px)}.btn-primary{color:#fff;background:var(--blue)}.btn-primary:hover:not(:disabled){background:var(--blue-dark)}.btn-ghost{background:#eff3fc;color:#354568}.btn-ghost:hover:not(:disabled){background:#e5ebf9}.btn-outline{color:#3757a7;background:white;border:1px solid #d5dff4}.btn-outline:hover:not(:disabled){background:#f6f8ff}.btn-sm{padding:5px 10px;min-height:29px;font-size:12px;border-radius:8px}.btn-text{border:0;background:transparent;color:var(--blue);padding:4px 7px;font-weight:700}.btn-danger{color:#b34550}.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stat{padding:13px 14px;background:#f7f9fe;border-radius:12px;border:1px solid #edf0f9}.stat b{font-size:25px;display:block;letter-spacing:-.7px;line-height:1.45;color:#243963}.stat span{font-size:12px;color:var(--muted)}.local-line{font-size:12px;color:var(--good);display:flex;align-items:center;gap:6px;margin-top:14px}.files{display:flex;flex-direction:column;gap:8px;margin-top:12px;max-height:235px;overflow:auto}.file-chip{border:1px solid #e7ecf5;background:#fbfcff;border-radius:10px;display:flex;align-items:center;gap:9px;padding:9px 12px}.file-chip .fname{flex:1;min-width:0;overflow-wrap:anywhere;font-weight:600;font-size:12px}.file-chip .fm{color:var(--muted);font-size:11px}.empty-info{color:var(--muted);font-size:12px;padding:10px 0}.notice{font-size:12px;line-height:1.65;color:#68758b;margin-top:12px}.notice strong{color:#435779}
 .toolbar{display:flex;align-items:center;flex-wrap:wrap;justify-content:space-between;gap:12px;padding:17px 20px;border-bottom:1px solid var(--border)}.left-tools,.right-tools{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.pill{border-radius:999px;background:#f1f4fb;border:1px solid #e4e8f5;color:#506080;padding:4px 10px;font-size:12px}.pill.good{background:#eaf7f0;color:#238467;border-color:#d8efe4}.curve-table{width:100%;border-collapse:collapse;table-layout:fixed}.curve-table th{font-size:11px;color:#78849b;font-weight:700;text-align:left;background:#fafbfe;padding:11px 13px;border-bottom:1px solid var(--border)}.curve-table td{padding:13px;border-bottom:1px solid #edf0f6;vertical-align:middle;font-size:13px}.curve-table tr:last-child td{border-bottom:none}.curve-table .col-check{width:48px;text-align:center}.curve-table .col-idx{width:46px}.curve-table .col-rows{width:88px}.curve-table .col-cols{width:140px}.curve-table .col-results{width:110px}.curve-table .col-tools{width:120px}.curve-table .name{font-weight:700;overflow-wrap:anywhere;color:#263957}.curve-table .source{font-size:11px;color:var(--muted);margin-top:2px;overflow-wrap:anywhere}.curve-table .detail-row td{padding:0;border-bottom:1px solid var(--border);background:#f9fbff}.details-inner{padding:18px 22px 20px 59px}.detail-columns{display:grid;grid-template-columns:1.07fr 1fr;gap:18px}.detail-title{font-weight:750;font-size:12px;margin-bottom:10px;color:#465779}.table-scroller{width:100%;overflow-x:auto}.table-scroller table{border-collapse:collapse;width:100%;white-space:nowrap}.table-scroller th,.table-scroller td{font-size:12px;padding:7px 10px;text-align:left;border-bottom:1px solid #edf0f5}.table-scroller th{font-size:11px;background:#f5f7fd;color:#60718f;font-weight:750}.table-scroller td{font-variant-numeric:tabular-nums}.result-mini{border-radius:10px;background:white;border:1px solid #e9edf5;padding:10px 11px;margin-bottom:7px}.result-mini .result-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.result-mini .result-name{font-size:12px;font-weight:750}.result-mini .result-body{margin-top:7px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 12px}.mini-metric{font-size:11px;overflow-wrap:anywhere;color:#637088}.mini-metric strong{color:#34425b;font-weight:650}.checkbox{display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-size:12px}.checkbox input{accent-color:var(--blue);width:15px;height:15px;cursor:pointer}.export-grid{display:grid;grid-template-columns:1fr 1fr;gap:17px}.export-card{padding:23px;min-width:0}.export-head{display:flex;align-items:center;gap:11px;margin-bottom:10px}.export-icon{width:38px;height:38px;display:grid;place-items:center;color:#fff;border-radius:11px;font-size:13px;font-weight:900;background:#386bd7}.export-icon.excel{background:#15916d}.export-head h3{margin:0;font-size:17px}.export-head p{margin:1px 0 0;color:var(--muted);font-size:12px}.group-label{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:12px;color:#3d4c66;font-weight:750;margin:20px 0 10px}.selector-grid{display:flex;flex-wrap:wrap;gap:8px;min-height:38px;align-items:center}.select-chip{border:1px solid #dce3f0;padding:7px 10px;border-radius:9px;display:inline-flex;align-items:center;gap:7px;cursor:pointer;background:#fff;font-size:12px;max-width:100%}.select-chip:has(input:checked){background:#f0f4ff;border-color:#b8c8ff;color:#2546a4}.select-chip input{accent-color:var(--blue);margin:0;cursor:pointer}.radio-row{display:flex;gap:8px;flex-wrap:wrap}.radio-option{border:1px solid #dce4f2;border-radius:10px;padding:11px 12px;flex:1;min-width:130px;font-size:12px;cursor:pointer;display:flex;align-items:flex-start;gap:8px}.radio-option:has(input:checked){border-color:#829af4;background:#f1f5ff}.radio-option input{accent-color:var(--blue);margin-top:2px}.radio-option span b{display:block;font-weight:750}.radio-option span small{display:block;color:var(--muted);margin-top:3px;font-size:11px;line-height:1.6}.under-options{display:flex;gap:14px;flex-wrap:wrap;margin:12px 0;align-items:center}.export-actions{display:flex;gap:9px;flex-wrap:wrap;margin:18px 0 10px}.caption{color:#70809a;font-size:11px;line-height:1.7}.hline{height:1px;background:#ecf0f6;margin:18px 0}.metrics-panel{max-height:260px;overflow:auto;border:1px solid #e7ebf5;border-radius:11px;padding:12px;background:#fafbfe}.metric-category{margin-bottom:13px}.metric-category:last-child{margin-bottom:0}.metric-category-title{color:#3d4a68;font-weight:800;font-size:12px;margin:0 0 9px;display:flex;align-items:center;gap:7px}.metric-category-title em{font-size:10px;color:#8a96aa;font-weight:400;font-style:normal}.metric-list{display:flex;flex-wrap:wrap;gap:8px}.mini-tag{color:#7b8ca6;font-size:11px;font-weight:600}.preview-grid{display:grid;grid-template-columns:1fr 1fr;gap:17px}.preview-card{min-width:0;padding:19px 21px}.preview-header{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:11px}.preview-header b{font-size:13px}.preview-wrap{height:220px;overflow:auto;border-radius:9px;border:1px solid #e7ecf6;background:#fff}.preview-wrap table{border-collapse:collapse;min-width:100%;white-space:nowrap;font-size:11px}.preview-wrap th,.preview-wrap td{padding:8px 11px;border-bottom:1px solid #eef1f6;text-align:left}.preview-wrap th{background:#f6f8fc;color:#60718b;position:sticky;top:0;font-weight:750;z-index:1}.preview-wrap td{color:#4c5a72}.preview-note{margin-top:8px;font-size:11px;color:var(--muted)}.disabled-area{opacity:.6}.footer{margin-top:26px;text-align:center;color:#8491a5;font-size:11px}.message{padding:14px 16px;border-radius:11px;background:#fff8e9;color:#986222;border:1px solid #f1debc;font-size:12px;margin-top:14px}.message.good{background:#edf8f2;border-color:#d0eddf;color:#217f5e}.toast{position:fixed;bottom:24px;right:24px;max-width:min(460px,calc(100vw - 36px));padding:12px 18px;border-radius:13px;box-shadow:0 11px 40px rgba(29,42,80,.19);color:#fff;background:#253d6b;z-index:99;font-size:13px;display:none}.toast.show{display:block}.toast.error{background:#9b3e4c}.file-prompt{font-size:12px;color:var(--muted);margin:8px 0}.result-none{font-size:12px;color:#8a93a6}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 @media(max-width:980px){.ingest-grid,.export-grid,.preview-grid,.detail-columns{grid-template-columns:1fr}.hero-art{display:none}.curve-table .col-cols,.curve-table .col-rows{display:none}.details-inner{padding:18px}.hero{padding:28px 25px}}@media(max-width:630px){.page{padding:14px 12px 42px}.masthead{margin:5px 2px 18px}.hero{min-height:0;border-radius:17px;padding:27px 20px}.pad,.export-card{padding:17px}.toolbar{padding:13px}.curve-table th,.curve-table td{padding:8px 6px;font-size:12px}.curve-table .col-idx{display:none}.curve-table .col-results{width:85px}.curve-table .col-tools{width:70px}.curve-table .col-check{width:34px}.curve-table .source{font-size:10px}.stats{gap:7px}.stat{padding:9px 11px}.stat b{font-size:21px}.header-meta{display:none}.search{max-width:100%}.right-tools{width:100%}.right-tools .search{flex:1}}
+
+/* Multi-format enhancements */
+.field-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.field-item{border:1px solid #dfe5f1;background:#fff;border-radius:10px;display:flex;gap:8px;align-items:center;padding:7px 9px;min-width:0;transition:border-color .12s,background .12s}
+.field-item.checked{border-color:#b9c9f6;background:#f5f8ff}.field-item.dragging{opacity:.38}.field-item.over{outline:2px dashed #829af4;outline-offset:1px}
+.field-item .field-check{display:flex;align-items:center;gap:8px;flex:1;min-width:0;cursor:pointer;font-size:12px;line-height:1.35}.field-item .field-check input{accent-color:#365ed8;flex-shrink:0}
+.field-item .field-check b{display:block;overflow-wrap:anywhere}.field-item .field-check small{display:block;font-size:10px;color:#8794ab}
+.field-index{width:21px;text-align:center;font-size:10px;color:#8b99ac;flex-shrink:0}.field-controls{display:flex;gap:2px;flex-shrink:0}
+.field-controls button{border:0;background:transparent;padding:2px 5px;color:#6982b8;font-weight:800;border-radius:5px}.field-controls button:hover{background:#e2ebff}
+.mode-select{border:1px solid #dfe5f3;background:#fff;padding:4px 7px;border-radius:8px;font-size:11px;color:#485c7e;max-width:175px}
+.kind-tag{display:inline-block;border-radius:6px;padding:1px 7px;font-size:10px;margin-right:6px;font-weight:750;vertical-align:baseline}
+.kind-tag.dsc{color:#3655a8;background:#ecf1ff}.kind-tag.rheology{color:#97601e;background:#fff3da}.kind-tag.generic{color:#16775e;background:#e9f7f1}
+.rules{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:15px}
+.rule{padding:11px 12px;border-radius:10px;background:#f8faff;border:1px solid #e9eef9;font-size:11px;color:#697994}.rule b{color:#33466b;display:block;font-size:12px;margin-bottom:2px}
+.btn-excel{background:#148262!important;color:#fff}.btn-excel:hover{background:#0b6c51!important}
+@media(max-width:800px){.field-list{grid-template-columns:1fr}.rules{grid-template-columns:1fr}.file-chip{flex-wrap:wrap}}
 </style>
 </head>
 <body>
 <div class="page">
- <header class="masthead"><div class="identity"><div class="logo">∿</div><span>DSC <span style="color:#5266a9">Curve Studio</span></span></div><div class="header-meta"><span class="live-dot"></span>完全本地运行 <span style="margin:0 4px">·</span> 无服务器上传 <span style="margin:0 4px">·</span> DSC / STARe Text</div></header>
- <section class="hero"><div class="hero-copy"><div class="eyebrow">THERMAL ANALYSIS WORKSPACE</div><h1>把复杂 DSC 数据，<br>整理成清晰的表格。</h1><p>识别文件中的每条 Curve、数据列与分析 Results；勾选所需内容，一键合并为 CSV 或多工作表 Excel。支持多个文件混合导入与重复 Result 保留。</p></div><svg class="hero-art" viewBox="0 0 230 122" fill="none" aria-hidden="true"><path d="M0 94H230M0 60H230M0 26H230" stroke="white" opacity=".1"/><path d="M0 71L26 70L44 72L56 70L67 67L77 40L84 25L92 47L105 73L120 76L140 75L152 75L163 52L171 45L180 66L195 72L230 73" stroke="#86C5FF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M0 89L26 88L44 87L62 88L73 78L81 70L88 84L107 89L126 88L139 89L153 91L166 72L177 52L186 76L201 90L230 89" stroke="#B7A7FF" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="84" cy="25" r="4" fill="#86C5FF"/><circle cx="177" cy="52" r="3.5" fill="#B7A7FF"/></svg></section>
- <section class="section"><div class="section-title"><h2><span class="n">01</span>导入与识别</h2><span class="subtle">支持拖放多个 TXT / DSC / ASC / DAT 文件</span></div><div class="ingest-grid">
-  <div class="card pad"><div class="drop" id="dropZone" tabindex="0" role="button" aria-label="点击或拖放文件导入"><div class="drop-icon">⇧</div><strong>将 DSC 文本文件拖放到这里</strong><span>或点击选择多个文件 · 浏览器本地解析</span></div><input class="sr-only" id="fileInput" type="file" accept=".txt,.dsc,.asc,.dat,.csv,text/plain" multiple><div class="file-options"><label class="control">文字编码 <select id="encoding"><option value="auto">自动识别（推荐）</option><option value="utf-8">UTF-8</option><option value="windows-1252">Windows-1252 / ANSI</option><option value="gb18030">GB18030 / GBK</option><option value="utf-16le">UTF-16 LE</option></select></label><button type="button" class="btn btn-ghost btn-sm" id="clearFiles">清空文件</button></div><div id="fileList" class="files"><div class="empty-info">尚未导入文件。可一次选择多个文件。</div></div></div>
-  <div class="card pad"><div class="stats"><div class="stat"><b id="statFiles">0</b><span>已导入文件</span></div><div class="stat"><b id="statCurves">0</b><span>识别到的 Curve</span></div><div class="stat"><b id="statRows">0</b><span>数据点总行数</span></div><div class="stat"><b id="statResults">0</b><span>Result 分组数</span></div></div><div class="local-line">● 所有文件只在你的浏览器中处理</div><div class="notice" id="parseStatus">支持标准 <strong>Curve Name / Curve Values / Results</strong> 分段格式；自动识别列名与单位，重复 Result 不会相互覆盖。</div></div>
+ <header class="masthead"><div class="identity"><div class="logo">∿</div><span>Lab <span style="color:#5266a9">Data Studio</span></span></div><div class="header-meta"><span class="live-dot"></span>完全本地运行 <span style="margin:0 4px">·</span> 无服务器上传 <span style="margin:0 4px">·</span> DSC / 流变 / 通用数据</div></header>
+ <section class="hero"><div class="hero-copy"><div class="eyebrow">UNIVERSAL SCIENTIFIC DATA WORKSPACE</div><h1>实验数据，不同格式。<br>一站识别、筛选、合并。</h1><p>智能识别 DSC 曲线、流变频率扫描和普通表格；自动采用约定模板。选列、调整列顺序、批量合并为 CSV / Excel，DSC Results 仍可单独汇总。</p></div><svg class="hero-art" viewBox="0 0 230 122" fill="none" aria-hidden="true"><path d="M0 94H230M0 60H230M0 26H230" stroke="white" opacity=".1"/><path d="M0 71L26 70L44 72L56 70L67 67L77 40L84 25L92 47L105 73L120 76L140 75L152 75L163 52L171 45L180 66L195 72L230 73" stroke="#86C5FF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M0 89L26 88L44 87L62 88L73 78L81 70L88 84L107 89L126 88L139 89L153 91L166 72L177 52L186 76L201 90L230 89" stroke="#B7A7FF" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="84" cy="25" r="4" fill="#86C5FF"/><circle cx="177" cy="52" r="3.5" fill="#B7A7FF"/></svg></section>
+ <section class="section"><div class="section-title"><h2><span class="n">01</span>导入与识别</h2><span class="subtle">支持 TXT / CSV / TSV / XLS / XLSX，多文件导入</span></div><div class="ingest-grid">
+  <div class="card pad"><div class="drop" id="dropZone" tabindex="0" role="button" aria-label="点击或拖放文件导入"><div class="drop-icon">⇧</div><strong>将实验数据文件拖放到这里</strong><span>或点击选择多个文件 · 浏览器本地解析</span></div><input class="sr-only" id="fileInput" type="file" accept=".txt,.dsc,.asc,.dat,.csv,.tsv,.xls,.xlsx,text/plain,.xlsm" multiple><div class="file-options"><label class="control">文字编码 <select id="encoding"><option value="auto">自动识别（推荐）</option><option value="utf-8">UTF-8</option><option value="windows-1252">Windows-1252 / ANSI</option><option value="gb18030">GB18030 / GBK</option><option value="utf-16le">UTF-16 LE</option></select></label><button type="button" class="btn btn-ghost btn-sm" id="clearFiles">清空文件</button></div><div id="fileList" class="files"><div class="empty-info">尚未导入文件。可一次选择多个文件。</div></div><div class="rules"><div class="rule"><b>DSC 特殊模板</b>识别 Curve Name / Curve Values / Results；默认 Ts + Value</div><div class="rule"><b>流变特殊模板</b>自动提取频率、储能模量、损耗模量、复数黏度四列</div><div class="rule"><b>通用兜底模板</b>第一行名称、第二行单位、第三行注释，第四行起为数据</div></div></div>
+  <div class="card pad"><div class="stats"><div class="stat"><b id="statFiles">0</b><span>已导入文件</span></div><div class="stat"><b id="statCurves">0</b><span>数据组 / Curve</span></div><div class="stat"><b id="statRows">0</b><span>数据点总行数</span></div><div class="stat"><b id="statResults">0</b><span>Result 分组数</span></div></div><div class="local-line">● 所有文件只在你的浏览器中处理</div><div class="notice" id="parseStatus">按照规则自动分类为 DSC、流变或通用；可在已导入文件右侧手动更改类型并重新解析。</div></div>
  </div></section>
- <section class="section"><div class="section-title"><h2><span class="n">02</span>曲线列表</h2><span class="subtle" id="selectionSummary">请选择需要导出的曲线</span></div><div class="card" style="overflow:hidden"><div class="toolbar"><div class="left-tools"><button type="button" class="btn btn-ghost btn-sm" id="selectAllCurves">全选曲线</button><button type="button" class="btn btn-ghost btn-sm" id="selectNoCurves">取消全选</button><span class="pill good" id="selectedCurvePill">0 / 0 已选</span></div><div class="right-tools"><input class="search" type="search" id="curveSearch" placeholder="搜索 Curve Name / 文件名 / 样品" aria-label="搜索曲线"><span class="subtle" id="filteredCount"></span></div></div><div style="overflow-x:auto"><table class="curve-table"><thead><tr><th class="col-check">选择</th><th class="col-idx">#</th><th>Curve Name / 来源</th><th class="col-rows">数据行</th><th class="col-cols">数据列</th><th class="col-results">Results</th><th class="col-tools">操作</th></tr></thead><tbody id="curveRows"><tr><td colspan="7" class="empty-info" style="text-align:center;padding:35px">上传文件后，这里会列出识别到的 Curve。</td></tr></tbody></table></div></div></section>
- <section class="section"><div class="section-title"><h2><span class="n">03</span>选择导出方式</h2><span class="subtle">两个独立导出功能，可分别使用</span></div><div class="export-grid">
-  <article class="card export-card"><div class="export-head"><div class="export-icon">CSV</div><div><h3>曲线数据合并 · CSV</h3><p>从所选 Curve 中提取数值列并合并</p></div></div><div class="group-label"><span>选择需要的数据列</span><div><button class="btn-text" id="allColumns">全选</button><button class="btn-text" id="noColumns">清空</button></div></div><div class="selector-grid" id="columnOptions"><span class="empty-info">导入文件后自动显示所有列</span></div><p class="caption" style="margin:7px 0 0">默认勾选 Ts 和 Value，与示例表格一致；也可自行全选或选择其他列。</p><div class="group-label">合并布局</div><div class="radio-row"><label class="radio-option"><input type="radio" name="csvMode" value="paired" checked><span><b>按曲线并排（截图格式）</b><small>每条 Curve 的所选列放在一起，列名、单位、Curve Name 占前三行</small></span></label><label class="radio-option"><input type="radio" name="csvMode" value="long"><span><b>纵向合并</b><small>曲线逐条追加，附来源与 Curve Name；适合统计分析</small></span></label><label class="radio-option"><input type="radio" name="csvMode" value="wide"><span><b>按数值对齐</b><small>不同 Curve 各占列，按 Index 或时间键匹配</small></span></label></div><div class="under-options"><label class="control" id="wideKeyWrap" style="display:none">对齐方式 <select id="wideKey"><option value="Index">按 Index 对齐</option><option value="t">按 t（秒）对齐</option><option value="Tr">按 Tr（°C）对齐</option><option value="Ts">按 Ts（°C）对齐</option></select></label><label class="control">CSV 分隔符 <select id="csvDelimiter"><option value=",">逗号 ,</option><option value=";">分号 ;</option><option value="tab">制表符 Tab</option></select></label></div><p class="caption" id="csvModeHint">第 1 行列名，第 2 行单位，第 3 行 Curve Name；第 4 行开始按原始行序并排。各曲线行数不同时，末尾不足的格子留空，不做插值或强制温度对齐。</p><div class="export-actions"><button type="button" class="btn btn-primary" id="downloadCsv">↓ 导出合并 CSV</button><button type="button" class="btn btn-outline" id="downloadZip">↓ 每条曲线独立 CSV（ZIP）</button></div><p class="caption">CSV 使用 UTF-8 BOM，便于 Excel 识别中文。ZIP 可一次性分割出多个曲线 CSV。</p></article>
-  <article class="card export-card"><div class="export-head"><div class="export-icon excel">XLS</div><div><h3>Results 汇总 · Excel</h3><p>提取转变、积分、峰值、结晶度等分析指标</p></div></div><div class="group-label"><span>选择需要的 Result 指标</span><div><button class="btn-text" id="allMetrics">全选</button><button class="btn-text" id="noMetrics">清空</button></div></div><div class="metrics-panel" id="resultOptions"><span class="empty-info">导入包含 Results 的曲线后，指标会出现在这里。</span></div><div class="under-options"><label class="checkbox"><input type="checkbox" id="includeEmptyResults">在结果汇总表中保留没有 Results 的 Curve</label></div><div class="message" id="resultHelp">结果汇总会生成 <strong>3 个工作表</strong>：一条 Curve 一行的「结果汇总」、保留每个 Result 分组和单位的「结果明细」、以及「曲线清单」。如果同一曲线有多个 Glass Transition，会分别标识 #1、#2。</div><div class="export-actions"><button type="button" class="btn btn-primary" id="downloadExcel" style="background:#15916d">↓ 导出 Results Excel (.xlsx)</button></div><p class="caption">仅导出所选 Curve 中、勾选的 Result 分组与指标。空 Results 不会制造虚构数据。</p></article>
+ <section class="section"><div class="section-title"><h2><span class="n">02</span>数据组列表</h2><span class="subtle" id="selectionSummary">选择要导出的文件或曲线</span></div><div class="card" style="overflow:hidden"><div class="toolbar"><div class="left-tools"><button type="button" class="btn btn-ghost btn-sm" id="selectAllCurves">全选数据</button><button type="button" class="btn btn-ghost btn-sm" id="selectNoCurves">取消全选</button><span class="pill good" id="selectedCurvePill">0 / 0 已选</span></div><div class="right-tools"><input class="search" type="search" id="curveSearch" placeholder="搜索曲线 / 文件名 / 数据组" aria-label="搜索曲线"><span class="subtle" id="filteredCount"></span></div></div><div style="overflow-x:auto"><table class="curve-table"><thead><tr><th class="col-check">选择</th><th class="col-idx">#</th><th>名称 / 文件 / 类型</th><th class="col-rows">数据行</th><th class="col-cols">数据列</th><th class="col-results">Results</th><th class="col-tools">操作</th></tr></thead><tbody id="curveRows"><tr><td colspan="7" class="empty-info" style="text-align:center;padding:35px">上传文件后，这里会列出数据组 / Curve。</td></tr></tbody></table></div></div></section>
+ <section class="section"><div class="section-title"><h2><span class="n">03</span>选择字段与导出方式</h2><span class="subtle">字段可勾选、上移、下移或拖动排序</span></div><div class="export-grid">
+  <article class="card export-card"><div class="export-head"><div class="export-icon">CSV</div><div><h3>实验数据合并 · CSV / Excel</h3><p>每个数据组连续占列，保留表头、单位与注释</p></div></div><div class="group-label"><span>选择需要的数据列</span><div><button class="btn-text" id="allColumns">全选</button><button class="btn-text" id="noColumns">清空</button></div></div><div class="field-list" id="columnOptions"><span class="empty-info">导入文件后自动显示所有列</span></div><p class="caption" style="margin:7px 0 0">DSC 默认 Ts + Value；流变默认 Angular frequency、Storage modulus、Loss modulus、Complex viscosity；通用默认全列。点击 ↑ ↓ 或拖放调整导出顺序。</p><div class="group-label">合并布局</div><div class="radio-row"><label class="radio-option"><input type="radio" name="csvMode" value="paired" checked><span><b>横向并排（两种截图格式）</b><small>每个文件或 Curve 占连续多列；名称、单位、注释分别在前三行</small></span></label><label class="radio-option"><input type="radio" name="csvMode" value="long"><span><b>纵向合并</b><small>数据组纵向追加，保留来源及数据组名称</small></span></label><label class="radio-option"><input type="radio" name="csvMode" value="wide"><span><b>按数值对齐</b><small>按选择的字段值精确匹配（无插值）</small></span></label></div><div class="under-options"><label class="control" id="wideKeyWrap" style="display:none">对齐方式 <select id="wideKey"><option value="Index">按 Index 对齐</option><option value="t">按 t（秒）对齐</option><option value="Tr">按 Tr（°C）对齐</option><option value="Ts">按 Ts（°C）对齐</option><option value="Angular frequency">按 Angular frequency（rad/s）对齐</option></select></label><label class="control">CSV 分隔符 <select id="csvDelimiter"><option value=",">逗号 ,</option><option value=";">分号 ;</option><option value="tab">制表符 Tab</option></select></label></div><p class="caption" id="csvModeHint">第 1 行：名称；第 2 行：单位；第 3 行：注释（DSC 为 Curve Name，流变为文件名，通用保留原注释）；第 4 行起为数据。每个文件占连续多列，不做插值。</p><div class="export-actions"><button type="button" class="btn btn-primary" id="downloadCsv">↓ 导出合并 CSV</button><button type="button" class="btn btn-primary btn-excel" id="downloadDataExcel">↓ 导出合并 Excel (.xlsx)</button><button type="button" class="btn btn-outline" id="downloadZip">↓ 各数据组拆分 CSV（ZIP）</button></div><p class="caption">CSV 使用 UTF-8 BOM；Excel 导出为兼容现代 Excel 的 .xlsx。传统 .xls 可直接导入，无需联网或安装组件。</p></article>
+  <article class="card export-card"><div class="export-head"><div class="export-icon excel">XLS</div><div><h3>DSC Results 汇总 · Excel</h3><p>只提取 DSC 曲线的转变、积分、峰值、结晶度等指标</p></div></div><div class="group-label"><span>选择需要的 Result 指标</span><div><button class="btn-text" id="allMetrics">全选</button><button class="btn-text" id="noMetrics">清空</button></div></div><div class="metrics-panel" id="resultOptions"><span class="empty-info">导入包含 Results 的曲线后，指标会出现在这里。</span></div><div class="under-options"><label class="checkbox"><input type="checkbox" id="includeEmptyResults">在结果汇总表中保留没有 Results 的 Curve</label></div><div class="message" id="resultHelp">结果汇总会生成 <strong>3 个工作表</strong>：一条 Curve 一行的「结果汇总」、保留每个 Result 分组和单位的「结果明细」、以及「曲线清单」。如果同一曲线有多个 Glass Transition，会分别标识 #1、#2。</div><div class="export-actions"><button type="button" class="btn btn-primary" id="downloadExcel" style="background:#15916d">↓ 导出 Results Excel (.xlsx)</button></div><p class="caption">仅导出所选 Curve 中、勾选的 Result 分组与指标。空 Results 不会制造虚构数据。</p></article>
  </div></section>
- <section class="section"><div class="section-title"><h2><span class="n">04</span>导出前预览</h2><span class="subtle">最多预览前 7 行 × 8 列，完整数据不会被截断</span></div><div class="preview-grid"><article class="card preview-card"><div class="preview-header"><b>CSV 曲线数据预览</b><span class="pill" id="csvPreviewCount">0 行</span></div><div class="preview-wrap" id="csvPreview"><p class="empty-info" style="padding:16px">尚无数据</p></div><div class="preview-note" id="csvPreviewNote">导入文件并勾选曲线与列即可预览。</div></article><article class="card preview-card"><div class="preview-header"><b>Excel Results 汇总预览</b><span class="pill" id="resultPreviewCount">0 行</span></div><div class="preview-wrap" id="resultPreview"><p class="empty-info" style="padding:16px">尚无数据</p></div><div class="preview-note" id="resultPreviewNote">若曲线包含 Results，这里展示选择后的汇总字段。</div></article></div></section>
- <footer class="footer">DSC Curve Studio · 浏览器本地解析 · 原始文件不会上传 · 导出数据请结合仪器原始结果进行校验</footer>
+ <section class="section"><div class="section-title"><h2><span class="n">04</span>导出前预览</h2><span class="subtle">最多预览前 7 行 × 8 列，完整数据不会被截断</span></div><div class="preview-grid"><article class="card preview-card"><div class="preview-header"><b>合并数据表预览</b><span class="pill" id="csvPreviewCount">0 行</span></div><div class="preview-wrap" id="csvPreview"><p class="empty-info" style="padding:16px">尚无数据</p></div><div class="preview-note" id="csvPreviewNote">导入文件并勾选数据组和列即可预览。</div></article><article class="card preview-card"><div class="preview-header"><b>Excel Results 汇总预览</b><span class="pill" id="resultPreviewCount">0 行</span></div><div class="preview-wrap" id="resultPreview"><p class="empty-info" style="padding:16px">尚无数据</p></div><div class="preview-note" id="resultPreviewNote">若曲线包含 Results，这里展示选择后的汇总字段。</div></article></div></section>
+ <footer class="footer">Lab Data Studio · 本地离线处理 · 默认特殊模板优先，未知数据使用通用模板 · 请校验仪器原始数据</footer>
 </div><div id="toast" class="toast" role="status" aria-live="polite"></div>
 <script>
 'use strict';
 (() => {
   const el = id => document.getElementById(id);
-  const state = {files:[],curves:[],columns:new Set(),metrics:new Set(),columnTouched:false,metricTouched:false,expanded:new Set(),search:'',nextId:0,csvMode:'paired',wideKey:'Index',delimiter:',',includeEmptyResults:false,parseWarnings:[]};
+  const state = {files:[],curves:[],columns:new Set(),columnOrder:[],metrics:new Set(),columnTouched:false,metricTouched:false,expanded:new Set(),search:'',nextId:0,csvMode:'paired',wideKey:'Index',delimiter:',',includeEmptyResults:false,parseWarnings:[]};
   const intFormat = n => new Intl.NumberFormat('zh-CN').format(n);
   const esc = v => String(v ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const fmtUnit = u => u ? ` [${u}]` : '';
@@ -168,6 +184,325 @@ button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,inpu
     if(!curves.length)warnings.push('没有找到 Curve Name / Curve Values 数据块，请检查文件格式或编码');
     return {curves,warnings};
   }
+  // ---------- Format-adapter layer: DSC / rheology / generic ----------
+  // New instrument templates can be added by introducing detect + adapt methods here.
+  const RHEO_FIELDS=['Angular frequency','Storage modulus','Loss modulus','Complex viscosity'];
+  const RHEO_EXTRA=['Tan(delta)','Oscillation torque','Step time','Temperature','Raw phase','Oscillation displacement'];
+  const RHEO_ALL=['Storage modulus','Loss modulus','Tan(delta)','Angular frequency','Oscillation torque','Step time','Temperature','Raw phase','Oscillation displacement','Complex viscosity'];
+  const RHEO_UNITS={'Angular frequency':'rad/s','Storage modulus':'Pa','Loss modulus':'Pa','Complex viscosity':'Pa.s','Oscillation torque':'µN.m','Step time':'s','Temperature':'°C','Raw phase':'°','Oscillation displacement':'rad'};
+  const stem=s=>String(s||'').replace(/\.[^.]+$/,'');
+  const labelKind=k=>({dsc:'DSC · 曲线',rheology:'流变 · 频率扫描',generic:'通用 · 表格'}[k]||'未知');
+  const normField=s=>String(s??'').replace(/\s+/g,' ').trim().toLowerCase();
+  const nonEmpty=v=>v!==null&&v!==undefined&&String(v).trim()!=='';
+  const cellStr=v=>v===null||v===undefined?'':String(v);
+  const headerColumns=(head,units,comments)=>head.map((n,i)=>{
+    const name=cellStr(n).trim()||`列 ${i+1}`;
+    const unit=cellStr(units?.[i]).trim();
+    const comment=cellStr(comments?.[i]).trim();
+    return {name,unit,key:colKey(name,unit),display:name+fmtUnit(unit),comment};
+  });
+  const asRows=matrix=>(matrix||[]).map(r=>Array.isArray(r)?r.map(cellStr):[cellStr(r)]);
+  function packRheologyA1(matrix){
+    // Some genuine .xls exports store an entire measurement as multiline text in A1.
+    const vals=matrix.flat().filter(nonEmpty);
+    if(vals.length!==1||!String(vals[0]).includes('\n'))return null;
+    const lines=String(vals[0]).replace(/\r/g,'').split('\n').map(s=>s.trim()).filter(Boolean);
+    if(lines.length<4)return null;
+    const names=[...lines[0].matchAll(/Storage modulus|Loss modulus|Tan\s*\(delta\)|Angular frequency|Oscillation torque|Step time|Temperature|Raw phase|Oscillation displacement|Complex viscosity/gi)].map(m=>RHEO_ALL.find(k=>normField(k)===normField(m[0]))||m[0]);
+    if(RHEO_FIELDS.some(n=>!names.includes(n)))return null;
+    const unitTokens=lines[1].split(/\s+/).filter(Boolean);
+    const units=names.map(n=>RHEO_UNITS[n]||'');
+    // Reuse units exactly as supplied if the source includes one per column.
+    if(unitTokens.length===names.length)names.forEach((_,i)=>units[i]=unitTokens[i]);
+    const rows=[names,units];
+    for(const line of lines.slice(2)){
+      const tokens=line.split(/\s+/).filter(Boolean);
+      if(tokens.length===names.length)rows.push(tokens);
+    }
+    return rows;
+  }
+  function isRheology(matrix){
+    if(!matrix?.length)return false;
+    const heads=matrix[0].map(normField);
+    return RHEO_FIELDS.every(name=>heads.includes(normField(name)))&&matrix.slice(2,7).some(r=>r.filter(x=>numericRx.test(String(x).trim())).length>=4);
+  }
+  function rowNumeric(row){const vals=(row||[]).filter(nonEmpty);return vals.length&&vals.filter(x=>numericRx.test(String(x).trim())).length/vals.length>=0.6;}
+  function toTableDataset(matrix,fileId,fileName,sheetName,kind,seq){
+    const tab=asRows(matrix);
+    const maxCols=Math.min(16384,tab.reduce((m,r)=>Math.max(m,r.length),0));
+    if(!maxCols||!tab.length)return null;
+    const head=Array.from({length:maxCols},(_,i)=>tab[0]?.[i]||'');
+    let dataStart=3,units=[],comments=[];
+    if(kind==='rheology'){
+      dataStart=rowNumeric(tab[2])?2:3; units=tab[1]||[]; comments=Array(maxCols).fill(stem(fileName));
+    }else{
+      const numeric2=rowNumeric(tab[1]);const numeric3=rowNumeric(tab[2]);
+      if(numeric2){dataStart=1;units=[];comments=Array(maxCols).fill(stem(fileName));}
+      else if(numeric3){dataStart=2;units=tab[1]||[];comments=Array(maxCols).fill(stem(fileName));}
+      else {dataStart=3;units=tab[1]||[];comments=tab[2]||[];}
+    }
+    const columns=headerColumns(head,units,comments);
+    const meaningful=columns.map((col,i)=>i).filter(i=>nonEmpty(head[i])||tab.slice(dataStart).some(row=>nonEmpty(row[i])));
+    if(!meaningful.length)return null;
+    const rows=tab.slice(dataStart).filter(row=>meaningful.some(i=>nonEmpty(row[i]))).map(row=>meaningful.map(i=>row[i]??''));
+    const ownCols=meaningful.map(i=>columns[i]);
+    const fileStem=stem(fileName);
+    const name=kind==='rheology'?(sheetName&&sheetName!=='Sheet1'?`${fileStem} · ${sheetName}`:fileStem):`${fileStem}${sheetName&&sheetName!=='Sheet1'?' · '+sheetName:''}`;
+    return {id:`f${fileId}_c${seq}`,fileId,fileName,name,sample:sheetName||'',kind,sheetName:sheetName||'',columns:ownCols,rows,groups:[],selected:true,sourceRowStart:dataStart+1};
+  }
+  function adaptSheets(sheets,fileId,fileName,forced){
+    const curves=[],warnings=[];
+    for(const sheet of sheets){
+      const cells=asRows(sheet.rows);const populated=cells.some(r=>r.some(nonEmpty));
+      if(!populated)continue;
+      const packed=packRheologyA1(cells);
+      const matrix=packed||cells;
+      const kind=forced==='rheology'||forced==='generic'?forced:(isRheology(matrix)?'rheology':'generic');
+      if(kind==='rheology'&&!isRheology(matrix))warnings.push(`${sheet.name}：没有识别到完整的四个流变字段，已尝试按现有列导入`);
+      const one=toTableDataset(matrix,fileId,fileName,sheet.name,kind,curves.length+1);
+      if(one){one.packed=!!packed;curves.push(one);}
+    }
+    if(!curves.length)warnings.push('表格中没有找到可导入的有效数据');
+    return {curves,warnings,kind:curves.length===1?curves[0].kind:curves.map(c=>c.kind).filter((v,i,a)=>a.indexOf(v)===i).join(' + ')};
+  }
+  function parseDelimited(text,delimiter){
+    const rows=[];let current=[],field='',quoted=false;
+    for(let i=0;i<text.length;i++){
+      const c=text[i];
+      if(c==='"'){
+        if(quoted&&text[i+1]==='"'){field+='"';i++;}else quoted=!quoted;
+      }else if(!quoted&&c===delimiter){current.push(field);field='';}
+      else if(!quoted&&(c==='\n'||c==='\r')){current.push(field);rows.push(current);current=[];field='';if(c==='\r'&&text[i+1]==='\n')i++;}
+      else field+=c;
+    }
+    if(field!==''||current.length){current.push(field);rows.push(current);}
+    return rows;
+  }
+  function textToMatrix(text){
+    const txt=String(text).replace(/^\ufeff/,'');
+    const sample=txt.split(/\r?\n/).slice(0,8).filter(s=>s.trim());
+    const candidates=['\t',',',';','|'];
+    const scores=candidates.map(delim=>{
+      const widths=sample.map(line=>parseDelimited(line,delim)[0]?.length||1);
+      const common=widths.filter(n=>n>1);const avg=common.reduce((a,b)=>a+b,0)/(common.length||1);
+      return {delim,score:common.length>=Math.min(2,sample.length)?common.length*10+avg-Math.max(...common,0)+Math.min(...common,1):0};
+    }).sort((a,b)=>b.score-a.score);
+    if(scores[0]?.score>0)return parseDelimited(txt,scores[0].delim);
+    const lines=txt.split(/\r\n|\n|\r/).filter(s=>s.trim());
+    return lines.map(s=>s.trim().split(/\s{2,}/).length>1?s.trim().split(/\s{2,}/):s.trim().split(/\s+/));
+  }
+  // Minimal OLE Compound Document + BIFF8 reader. No CDN or external script required.
+  const oleMagic=[0xd0,0xcf,0x11,0xe0,0xa1,0xb1,0x1a,0xe1];
+  const isOle=b=>oleMagic.every((x,i)=>b[i]===x);
+  const isZip=b=>b[0]===0x50&&b[1]===0x4b;
+  function oleWorkbook(input){
+    const a=input instanceof Uint8Array?input:new Uint8Array(input),v=new DataView(a.buffer,a.byteOffset,a.byteLength);
+    if(!isOle(a))throw new Error('不是传统 .xls 二进制文件');
+    const u16=(p)=>v.getUint16(p,true),u32=p=>v.getUint32(p,true);
+    const sectorSize=2**u16(30),miniSize=2**u16(32);
+    if(![512,4096].includes(sectorSize))throw new Error('不支持的 OLE 扇区大小');
+    const maxSector=Math.floor(a.length/sectorSize)-1;
+    const sec=id=>{if(id>=maxSector||id<0)throw new Error('OLE 扇区越界');return a.subarray((id+1)*sectorSize,(id+2)*sectorSize);};
+    let fatIds=[];
+    for(let i=0;i<109;i++){const n=u32(76+4*i);if(n<0xfffffffa)fatIds.push(n);}
+    let difat=u32(68);
+    for(let i=0;i<Math.min(u32(72),500)&&difat<0xfffffffa;i++){
+      const part=sec(difat),view=new DataView(part.buffer,part.byteOffset,part.byteLength);
+      for(let j=0;j<sectorSize/4-1;j++){const id=view.getUint32(j*4,true);if(id<0xfffffffa)fatIds.push(id);}
+      difat=view.getUint32(sectorSize-4,true);
+    }
+    fatIds=fatIds.slice(0,u32(44));
+    const fatBytes=concatUint(fatIds.map(sec));const fat=new DataView(fatBytes.buffer,fatBytes.byteOffset,fatBytes.byteLength);
+    const chain=(start,table,step,getSegment,limit=100000)=>{
+      const parts=[],visited=new Set();let index=start;
+      while(index<0xfffffffa&&!visited.has(index)&&parts.length<limit){
+        visited.add(index);parts.push(getSegment(index));
+        if(index*4+4>table.byteLength)break;
+        index=table.getUint32(index*4,true);
+      }
+      return concatUint(parts);
+    };
+    const dir=chain(u32(48),fat,sectorSize,sec);
+    const entries=[];const dv=new DataView(dir.buffer,dir.byteOffset,dir.byteLength);
+    for(let o=0;o+128<=dir.length;o+=128){
+      const nameLen=dv.getUint16(o+64,true);if(!nameLen||nameLen>64)continue;
+      const name=new TextDecoder('utf-16le').decode(dir.subarray(o,o+nameLen-2));
+      const kind=dir[o+66],start=dv.getUint32(o+116,true),size=dv.getUint32(o+120,true);
+      entries.push({name,kind,start,size});
+    }
+    const entry=entries.find(x=>x.name==='Workbook'||x.name==='Book');if(!entry)throw new Error('未找到 OLE Workbook 流');
+    let result;
+    if(entry.size>=u32(56))result=chain(entry.start,fat,sectorSize,sec).subarray(0,entry.size);
+    else {
+      const root=entries.find(x=>x.kind===5);if(!root)throw new Error('OLE Root Entry 缺失');
+      const bytes=chain(root.start,fat,sectorSize,sec).subarray(0,root.size);
+      const mfBytes=chain(u32(60),fat,sectorSize,sec,Math.max(1,u32(64)));const mf=new DataView(mfBytes.buffer,mfBytes.byteOffset,mfBytes.byteLength);
+      const getMini=i=>bytes.subarray(i*miniSize,(i+1)*miniSize);
+      result=chain(entry.start,mf,miniSize,getMini).subarray(0,entry.size);
+    }
+    return result;
+  }
+  function concatUint(parts){const total=parts.reduce((n,p)=>n+p.length,0),out=new Uint8Array(total);let p=0;for(const part of parts){out.set(part,p);p+=part.length;}return out;}
+  function readSst(segments){
+    const st=segments.map(s=>s instanceof Uint8Array?s:new Uint8Array(s));
+    let si=0,off=0;
+    function move(){while(si<st.length&&off>=st[si].length){si++;off=0;}}
+    function getByte(){move();if(si>=st.length)throw new Error('BIFF SST 截断');return st[si][off++];}
+    function get16(){return getByte()|getByte()<<8;}
+    function get32(){return (getByte()|(getByte()<<8)|(getByte()<<16)|(getByte()<<24))>>>0;}
+    function skip(n){for(let k=0;k<n;k++)getByte();}
+    const total=get32(),unique=get32();if(unique>2000000)throw new Error('SST 字符串数量异常');
+    const strs=[];
+    for(let i=0;i<unique;i++){
+      const len=get16(),flags=getByte();const rich=flags&8?get16():0,ext=flags&4?get32():0;
+      let wide=!!(flags&1),chars=[];
+      for(let j=0;j<len;j++){
+        move();
+        if(si>=st.length)throw new Error('BIFF SST 内容不足');
+        if(off===0&&j>0){const mode=getByte();wide=!!(mode&1);}
+        if(wide){
+          // A UTF-16 code unit is normally not split between CONTINUE blocks.
+          if(st[si].length-off<2&&si+1<st.length){si++;off=0;wide=!!(getByte()&1);}
+          if(wide)chars.push(String.fromCharCode(get16()));else chars.push(String.fromCharCode(getByte()));
+        }else chars.push(String.fromCharCode(getByte()));
+      }
+      if(rich)skip(rich*4);if(ext)skip(ext);
+      strs.push(chars.join(''));
+    }
+    return strs;
+  }
+  function readXls(input){
+    const bytes=oleWorkbook(input),v=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength);
+    const u16=o=>v.getUint16(o,true),u32=o=>v.getUint32(o,true);
+    const bounds=[],records=[];let sst=[];
+    for(let p=0;p+4<=bytes.length;){
+      const code=u16(p),size=u16(p+2);if(p+4+size>bytes.length)break;
+      records.push({code,p:p+4,size,at:p});
+      if(code===0x85){const data=p+4,len=bytes[data+6],wide=bytes[data+7]&1;
+        const name=new TextDecoder(wide?'utf-16le':'windows-1252').decode(bytes.subarray(data+8,data+8+len*(wide?2:1)));
+        bounds.push({name,offset:u32(data)});
+      }
+      p+=4+size;
+    }
+    const sstPos=records.findIndex(x=>x.code===0xfc);
+    if(sstPos>=0){const parts=[bytes.subarray(records[sstPos].p,records[sstPos].p+records[sstPos].size)];
+      for(let k=sstPos+1;k<records.length&&records[k].code===0x3c;k++)parts.push(bytes.subarray(records[k].p,records[k].p+records[k].size));
+      sst=readSst(parts);
+    }
+    const tables=bounds.sort((a,b)=>a.offset-b.offset).map(s=>({name:s.name,cells:new Map(),maxRow:-1,maxCol:-1,offset:s.offset}));
+    if(!tables.length)throw new Error('Excel 工作簿不包含工作表');
+    let sheet=-1;
+    function put(r,c,value){if(sheet<0||r>1048575||c>16383||r<0||c<0)return;const s=tables[sheet];s.cells.set(`${r}:${c}`,value);s.maxRow=Math.max(s.maxRow,r);s.maxCol=Math.max(s.maxCol,c);}
+    const rkValue=raw=>{
+      let x;
+      if(raw&2)x=raw>>2;
+      else {const b=new ArrayBuffer(8),dv=new DataView(b);dv.setUint32(0,0,true);dv.setUint32(4,raw&0xfffffffc,true);x=dv.getFloat64(0,true);}
+      return raw&1?x/100:x;
+    };
+    for(const rec of records){
+      while(sheet+1<tables.length&&rec.at>=tables[sheet+1].offset)sheet++;
+      if(sheet<0||rec.at<tables[sheet].offset)continue;
+      const p=rec.p,n=rec.size;
+      if(n<6)continue;
+      const row=u16(p),col=u16(p+2);
+      if(rec.code===0xfd&&n>=10){put(row,col,sst[u32(p+6)]??'');}
+      else if(rec.code===0x203&&n>=14){put(row,col,v.getFloat64(p+6,true));}
+      else if(rec.code===0x27e&&n>=10){put(row,col,rkValue(u32(p+6)));}
+      else if(rec.code===0xbd&&n>=12){const last=u16(p+n-2);for(let j=col;j<=last;j++){const at=p+4+(j-col)*6;if(at+6<=p+n-2)put(row,j,rkValue(u32(at+2)));}}
+      else if(rec.code===0x205&&n>=8){put(row,col,bytes[p+7]?'#ERR':(bytes[p+6]?'TRUE':'FALSE'));}
+      else if(rec.code===0x204&&n>=9){const count=u16(p+6),fl=bytes[p+8],start=p+9;
+        put(row,col,new TextDecoder(fl&1?'utf-16le':'windows-1252').decode(bytes.subarray(start,start+count*(fl&1?2:1))));}
+      else if(rec.code===0x6&&n>=14){const bytes8=bytes.subarray(p+6,p+14);
+        if(bytes8[6]===0xff&&bytes8[7]===0xff)continue;
+        put(row,col,v.getFloat64(p+6,true));}
+    }
+    return tables.filter(s=>s.cells.size).map(s=>{
+      if((s.maxRow+1)*(s.maxCol+1)>10000000)throw new Error('表格行列范围异常');
+      const rows=Array.from({length:s.maxRow+1},()=>Array(s.maxCol+1).fill(''));
+      for(const [key,value] of s.cells){const [r,c]=key.split(':').map(Number);rows[r][c]=value;}
+      return {name:s.name,rows};
+    });
+  }
+  const unxml=s=>String(s||'').replace(/&#x([0-9a-f]+);/gi,(_,x)=>String.fromCodePoint(parseInt(x,16))).replace(/&#(\d+);/g,(_,x)=>String.fromCodePoint(+x)).replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&amp;/g,'&');
+  function xmlAttr(tag,key){return unxml(tag.match(new RegExp(`\\b${key.replace(':','\\:')}="([^"]*)"`))?.[1]||'');}
+  async function unzipXml(input){
+    const a=input instanceof Uint8Array?input:new Uint8Array(input),v=new DataView(a.buffer,a.byteOffset,a.byteLength);
+    let end=-1;for(let i=a.length-22;i>=Math.max(0,a.length-66000);i--){if(v.getUint32(i,true)===0x06054b50){end=i;break;}}
+    if(end<0)throw new Error('找不到 XLSX ZIP 目录');
+    const count=v.getUint16(end+10,true),central=v.getUint32(end+16,true),entries=new Map(),decoder=new TextDecoder('utf-8');
+    let at=central;
+    for(let k=0;k<count;k++){
+      if(at+46>a.length||v.getUint32(at,true)!==0x02014b50)throw new Error('XLSX 目录损坏');
+      const method=v.getUint16(at+10,true),compressed=v.getUint32(at+20,true),nameLen=v.getUint16(at+28,true),ex=v.getUint16(at+30,true),comment=v.getUint16(at+32,true),offset=v.getUint32(at+42,true);
+      const name=decoder.decode(a.subarray(at+46,at+46+nameLen));entries.set(name,{method,compressed,offset});at+=46+nameLen+ex+comment;
+    }
+    async function get(name){const item=entries.get(name);if(!item)return null;
+      const p=item.offset;if(v.getUint32(p,true)!==0x04034b50)throw new Error(`XLSX 本地数据损坏：${name}`);
+      const start=p+30+v.getUint16(p+26,true)+v.getUint16(p+28,true),raw=a.subarray(start,start+item.compressed);
+      let data;
+      if(item.method===0)data=raw;
+      else if(item.method===8){if(typeof DecompressionStream==='undefined')throw new Error('浏览器不支持 XLSX 解压（请升级 Chrome 或 Edge）');
+        const stream=new Blob([raw]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+        data=new Uint8Array(await new Response(stream).arrayBuffer());
+      }else throw new Error('不支持的 XLSX ZIP 压缩方式');
+      return decoder.decode(data);
+    }
+    return {entries,get};
+  }
+  function parseSheetXML(xml,shared){
+    const rows=[],cells=xml.match(/<c\b[^>]*>[\s\S]*?<\/c>|<c\b[^>]*\/>/g)||[];
+    for(const token of cells){const open=token.match(/^<c\b[^>]*>/)?.[0]||token;
+      const addr=xmlAttr(open,'r'),found=addr.match(/^([A-Z]+)(\d+)$/i);if(!found)continue;
+      let col=0;for(const ch of found[1].toUpperCase())col=col*26+ch.charCodeAt(0)-64;col--;
+      const row=+found[2]-1;if(row<0||row>1048575||col<0||col>16383)continue;
+      const type=xmlAttr(open,'t');let data='';
+      if(type==='inlineStr'||type==='str'){
+        const chunks=[...token.matchAll(/<t(?:\s[^>]*)?>([\s\S]*?)<\/t>/g)].map(x=>unxml(x[1]));data=chunks.join('');
+        if(!chunks.length)data=unxml(token.match(/<v>([\s\S]*?)<\/v>/)?.[1]);
+      }else{
+        data=unxml(token.match(/<v>([\s\S]*?)<\/v>/)?.[1]);
+        if(type==='s')data=shared[Number(data)]||'';
+        else if(type==='b')data=data==='1'?'TRUE':'FALSE';
+      }
+      if(!rows[row])rows[row]=[];
+      rows[row][col]=data;
+    }
+    return rows.map(r=>r||[]);
+  }
+  async function readXlsx(input){
+    const zip=await unzipXml(input);
+    const wb=await zip.get('xl/workbook.xml');if(!wb)throw new Error('XLSX 缺少 workbook.xml');
+    const sharedXml=await zip.get('xl/sharedStrings.xml'),shared=[];
+    if(sharedXml){for(const si of sharedXml.match(/<si\b[^>]*>[\s\S]*?<\/si>/g)||[])shared.push([...si.matchAll(/<t(?:\s[^>]*)?>([\s\S]*?)<\/t>/g)].map(x=>unxml(x[1])).join(''));}
+    const relXml=await zip.get('xl/_rels/workbook.xml.rels')||'',rels=new Map();
+    for(const rel of relXml.match(/<Relationship\b[^>]*\/?\s*>/g)||[])rels.set(xmlAttr(rel,'Id'),xmlAttr(rel,'Target'));
+    const sheets=[];
+    for(const entry of wb.match(/<sheet\b[^>]*\/?\s*>/g)||[]){
+      const name=xmlAttr(entry,'name'),id=xmlAttr(entry,'r:id');let target=rels.get(id)||'';
+      let path=target.startsWith('/')?target.slice(1):'xl/'+target;
+      path=path.replace(/\\/g,'/');const seg=[];for(const part of path.split('/')){if(part==='..')seg.pop();else if(part&&part!=='.')seg.push(part);}path=seg.join('/');
+      const xml=await zip.get(path);if(xml)sheets.push({name,rows:parseSheetXML(xml,shared)});
+    }
+    if(!sheets.length)throw new Error('XLSX 中没有有效工作表');
+    return sheets;
+  }
+  async function parseAnyFile(buffer,id,fileName,forced='auto'){
+    const bytes=new Uint8Array(buffer),xlsx=isZip(bytes),xls=isOle(bytes);
+    if(xls||xlsx){
+      if(forced==='dsc')throw new Error('二进制 Excel 文件不包含 DSC 文本曲线段，请选择自动识别或通用模板');
+      const sheets=xls?readXls(bytes):await readXlsx(bytes);
+      return {...adaptSheets(sheets,id,fileName,forced),encoding:xls?'BIFF8 · XLS':'OOXML · XLSX'};
+    }
+    const decoded=decodeBytes(buffer,el('encoding').value);
+    const sniffDSC=/(?:^|\n)\s*Curve Name\s*:/i.test(decoded.text)&&/(?:^|\n)\s*Curve Values\s*:/i.test(decoded.text);
+    if(forced==='dsc'||(forced==='auto'&&sniffDSC)){
+      const parsed=parseDSC(decoded.text,id,fileName);parsed.curves.forEach(c=>{c.kind='dsc';c.columns.forEach(col=>col.comment=c.name);});
+      return {...parsed,kind:'dsc',encoding:decoded.encoding};
+    }
+    if(forced==='dsc')throw new Error('没有识别到 DSC 曲线段');
+    return {...adaptSheets([{name:'Sheet1',rows:textToMatrix(decoded.text)}],id,fileName,forced),encoding:decoded.encoding};
+  }
+
   async function addFiles(fileList){
     const items=[...fileList];if(!items.length)return;
     const already=new Set(state.files.map(f=>f.signature)); let added=0;
@@ -177,30 +512,35 @@ button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,inpu
       try{
         const buffer=await file.arrayBuffer();
         const id=++state.nextId;
-        const result=decodeBytes(buffer,el('encoding').value);
-        const parsed=parseDSC(result.text,id,file.name);
-        state.files.push({id,fileName:file.name,size:file.size,signature,buffer,encoding:result.encoding,curves:parsed.curves,warnings:parsed.warnings});
+        const parsed=await parseAnyFile(buffer,id,file.name,'auto');
+        state.files.push({id,fileName:file.name,size:file.size,signature,buffer,mode:'auto',kind:parsed.kind,encoding:parsed.encoding,curves:parsed.curves,warnings:parsed.warnings});
         already.add(signature);added++;
       }catch(err){toast(`无法读取 ${file.name}：${err.message}`,true);}
     }
     recompute();
-    if(added)toast(`已导入 ${added} 个文件，识别 ${state.curves.length} 条 Curve`);
+    if(added)toast(`已导入 ${added} 个文件，识别 ${state.curves.length} 个数据组 / Curve`);
   }
   function recompute(){
     state.curves=state.files.flatMap(f=>f.curves);
     state.parseWarnings=state.files.flatMap(f=>f.warnings.map(w=>`${f.fileName}：${w}`));
     const available=new Set(state.curves.flatMap(c=>c.columns.map(col=>col.key)));
     const foundMetrics=new Set(state.curves.flatMap(c=>c.groups.flatMap(g=>g.metrics.map(m=>metricKey(g.type,m.name,m.unit)))));
-    if(!state.columnTouched){
-      const preferred=allColumns().filter(col=>col.name==='Ts'||col.name==='Value').map(col=>col.key);
-      state.columns=new Set(preferred.length?preferred:[...available]);
-    }
-    else state.columns=new Set([...state.columns].filter(k=>available.has(k)));
+    const columnList=collectColumns();
+    const defaultOrder=[...columnList.filter(x=>x.name==='Ts'||x.name==='Value'),...RHEO_FIELDS.flatMap(name=>columnList.filter(x=>normField(x.name)===normField(name))),...columnList].map(x=>x.key);
+    const previousKeys=new Set(state.columnOrder);
+    state.columnOrder=[...new Set([...state.columnOrder.filter(k=>available.has(k)),...defaultOrder])];
+    const prefer=columnList.filter(col=>{
+      const kinds=new Set(state.curves.filter(c=>c.columns.some(x=>x.key===col.key)).map(c=>c.kind));
+      return kinds.has('generic')||(kinds.has('dsc')&&['Ts','Value'].includes(col.name))||(kinds.has('rheology')&&RHEO_FIELDS.some(f=>normField(f)===normField(col.name)));
+    }).map(c=>c.key);
+    if(!state.columnTouched){state.columns=new Set(prefer.length?prefer:[...available]);}
+    else state.columns=new Set([...state.columns].filter(k=>available.has(k)).concat(prefer.filter(k=>!previousKeys.has(k))));
     if(!state.metricTouched)state.metrics=new Set(foundMetrics);
     else state.metrics=new Set([...state.metrics].filter(k=>foundMetrics.has(k)));
     renderAll();
   }
-  function allColumns(){const m=new Map();for(const c of state.curves)for(const col of c.columns)if(!m.has(col.key))m.set(col.key,col);return [...m.values()];}
+  function collectColumns(){const m=new Map();for(const c of state.curves)for(const col of c.columns)if(!m.has(col.key))m.set(col.key,col);return [...m.values()];}
+  function allColumns(){const map=new Map(collectColumns().map(x=>[x.key,x]));return state.columnOrder.map(k=>map.get(k)).filter(Boolean);}
   function allMetrics(){const cats=new Map();for(const c of state.curves)for(const g of c.groups){if(!cats.has(g.type))cats.set(g.type,new Map());for(const m of g.metrics){const key=metricKey(g.type,m.name,m.unit);if(!cats.get(g.type).has(key))cats.get(g.type).set(key,{...m,key});}}return cats;}
   function renderStats(){
     el('statFiles').textContent=intFormat(state.files.length);el('statCurves').textContent=intFormat(state.curves.length);
@@ -208,20 +548,21 @@ button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,inpu
     el('statResults').textContent=intFormat(state.curves.reduce((s,c)=>s+c.groups.length,0));
     const count=selectedCurves().length;
     el('selectedCurvePill').textContent=`${count} / ${state.curves.length} 已选`;
-    el('selectionSummary').textContent=`已选 ${count} 条曲线 · ${intFormat(selectedCurves().reduce((s,c)=>s+c.rows.length,0))} 行原始数据`;
-    const msg=state.parseWarnings.length?`解析提示：${state.parseWarnings.slice(0,2).join('；')}${state.parseWarnings.length>2?'…':''}`:'支持标准 Curve Name / Curve Values / Results 分段格式；重复 Result 会分组保存。';
+    el('selectionSummary').textContent=`已选 ${count} 个数据组 · ${intFormat(selectedCurves().reduce((s,c)=>s+c.rows.length,0))} 行原始数据`;
+    const byType=['dsc','rheology','generic'].map(t=>`${labelKind(t)} ${state.curves.filter(c=>c.kind===t).length}`).join(' · ');
+    const msg=state.parseWarnings.length?`解析提示：${state.parseWarnings.slice(0,2).join('；')}${state.parseWarnings.length>2?'…':''}`:(state.curves.length?byType:'自动检测特殊数据类型；其他按通用模板处理。');
     el('parseStatus').textContent=msg;
   }
   function renderFiles(){
-    el('fileList').innerHTML=state.files.length?state.files.map(f=>`<div class="file-chip"><span style="font-size:19px;color:#4d6dd8">▤</span><div style="flex:1;min-width:0"><div class="fname">${esc(f.fileName)}</div><div class="fm">${intFormat(f.curves.length)} Curve · ${(f.size/1024).toFixed(1)} KB · ${esc(f.encoding)}</div></div><button type="button" class="btn-text btn-danger" data-action="remove-file" data-id="${f.id}" title="移除这个文件">移除</button></div>`).join(''):'<div class="empty-info">尚未导入文件。可一次选择多个文件。</div>';
+    el('fileList').innerHTML=state.files.length?state.files.map(f=>`<div class="file-chip"><span style="font-size:19px;color:#4d6dd8">▤</span><div style="flex:1;min-width:0"><div class="fname">${esc(f.fileName)}</div><div class="fm">${f.curves.length} 数据组 · ${(f.size/1024).toFixed(1)} KB · ${esc(f.encoding)} · ${esc(f.kind||'')}</div></div><select class="mode-select" data-action="file-mode" data-id="${f.id}" title="识别模板；修改后立即重新解析"><option value="auto" ${f.mode==='auto'?'selected':''}>自动识别</option><option value="dsc" ${f.mode==='dsc'?'selected':''}>强制 DSC</option><option value="rheology" ${f.mode==='rheology'?'selected':''}>强制流变</option><option value="generic" ${f.mode==='generic'?'selected':''}>强制通用</option></select><button type="button" class="btn-text btn-danger" data-action="remove-file" data-id="${f.id}" title="移除此文件">移除</button></div>`).join(''):'<div class="empty-info">尚未导入文件。可一次选择多个文件。</div>';
   }
   function renderCurves(){
-    const q=state.search.trim().toLowerCase();const filtered=state.curves.filter(c=>`${c.name} ${c.fileName} ${c.sample}`.toLowerCase().includes(q));
+    const q=state.search.trim().toLowerCase();const filtered=state.curves.filter(c=>`${c.name} ${c.fileName} ${c.sample} ${labelKind(c.kind)}`.toLowerCase().includes(q));
     el('filteredCount').textContent=q?`显示 ${filtered.length} 条`:'';
-    if(!filtered.length){el('curveRows').innerHTML=`<tr><td colspan="7" style="text-align:center;padding:34px;color:#8792a6">${state.curves.length?'没有匹配的曲线':'上传文件后，这里会列出识别到的 Curve。'}</td></tr>`;return;}
+    if(!filtered.length){el('curveRows').innerHTML=`<tr><td colspan="7" style="text-align:center;padding:34px;color:#8792a6">${state.curves.length?'没有匹配的曲线':'上传文件后，这里会列出数据组 / Curve。'}</td></tr>`;return;}
     el('curveRows').innerHTML=filtered.map((c,ix)=>{
       const index=state.curves.indexOf(c)+1,hasResult=c.groups.length>0,opened=state.expanded.has(c.id);
-      return `<tr><td class="col-check"><input type="checkbox" data-action="select-curve" data-id="${c.id}" ${c.selected?'checked':''} aria-label="选中曲线 ${esc(c.name)}"></td><td class="col-idx" style="color:#8a96ac">${index}</td><td><div class="name">${esc(c.name)}</div><div class="source">${esc(c.fileName)}${c.sample?' · '+esc(c.sample):''}</div></td><td class="col-rows">${intFormat(c.rows.length)}</td><td class="col-cols">${c.columns.length} 列 <span style="color:#98a6bc;font-size:11px">${esc(c.columns.map(x=>x.name).join('/'))}</span></td><td class="col-results"><span class="pill ${hasResult?'good':''}">${hasResult?c.groups.length+' 组':'无'}</span></td><td class="col-tools"><button class="btn-text" data-action="expand" data-id="${c.id}">${opened?'收起':'查看详情'}</button></td></tr>${opened?curveDetails(c):''}`;
+      return `<tr><td class="col-check"><input type="checkbox" data-action="select-curve" data-id="${c.id}" ${c.selected?'checked':''} aria-label="选择 ${esc(c.name)}"></td><td class="col-idx" style="color:#8a96ac">${index}</td><td><div class="name"><span class="kind-tag ${c.kind||'dsc'}">${esc(labelKind(c.kind||'dsc'))}</span>${esc(c.name)}</div><div class="source">${esc(c.fileName)}${c.sample?' · '+esc(c.sample):''}${c.packed?' · 多行文本单元格已展开':''}</div></td><td class="col-rows">${intFormat(c.rows.length)}</td><td class="col-cols">${c.columns.length} 列 <span style="color:#98a6bc;font-size:11px">${esc(c.columns.map(x=>x.name).join('/'))}</span></td><td class="col-results"><span class="pill ${hasResult?'good':''}">${hasResult?c.groups.length+' 组':'无'}</span></td><td class="col-tools"><button class="btn-text" data-action="expand" data-id="${c.id}">${opened?'收起':'查看详情'}</button></td></tr>${opened?curveDetails(c):''}`;
     }).join('');
   }
   function curveDetails(c){
@@ -232,7 +573,12 @@ button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,inpu
   }
   function renderColumns(){
     const cols=allColumns();
-    el('columnOptions').innerHTML=cols.length?cols.map(c=>`<label class="select-chip"><input type="checkbox" data-action="select-column" data-key="${esc(c.key)}" ${state.columns.has(c.key)?'checked':''}><span>${esc(c.display)}</span></label>`).join(''):'<span class="empty-info">导入文件后自动显示所有列</span>';
+    el('columnOptions').innerHTML=cols.length?cols.map((c,i)=>`<div class="field-item ${state.columns.has(c.key)?'checked':''}" draggable="true" data-drag-key="${esc(c.key)}"><span class="field-index" title="拖动排序">☷</span><label class="field-check"><input type="checkbox" data-action="select-column" data-key="${esc(c.key)}" ${state.columns.has(c.key)?'checked':''}><span><b>${esc(c.name)}</b><small>${esc(c.unit||'无单位')} · 当前序号 ${i+1}</small></span></label><div class="field-controls"><button type="button" data-action="col-up" data-key="${esc(c.key)}" title="上移一位" aria-label="${esc(c.name)} 上移">↑</button><button type="button" data-action="col-down" data-key="${esc(c.key)}" title="下移一位" aria-label="${esc(c.name)} 下移">↓</button></div></div>`).join(''):'<span class="empty-info">导入文件后自动显示数据列</span>';
+  }
+  function moveColumn(key,to){
+    const arr=state.columnOrder;const at=arr.indexOf(key);if(at<0)return;
+    const i=Math.max(0,Math.min(arr.length-1,to));if(i===at)return;
+    arr.splice(at,1);arr.splice(i,0,key);renderColumns();renderPreviews();
   }
   function renderMetrics(){
     const cats=allMetrics();
@@ -291,20 +637,19 @@ button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,inpu
   // Data rows are aligned by their original row position (not by Ts/Index/time keys).
   function generatePairedCsv(curves=usefulCurves()){
     const cols=selectedColumns();
-    const fields=curves.flatMap(curve=>cols.map(col=>({curve,col,index:findColIndex(curve,col.key)})));
+    const fields=curves.flatMap(curve=>cols.map(col=>({curve,col,index:findColIndex(curve,col.key)})).filter(x=>x.index>=0));
     if(!fields.length)return {headers:[],rows:[],dataRowCount:0};
     const maxRows=Math.max(0,...curves.map(c=>c.rows.length));
     const headers=fields.map(f=>f.col.name);
-    const unitRow=fields.map(f=>f.index<0?'':f.col.unit);
-    const nameRow=fields.map(f=>f.curve.name);
-    const rows=[unitRow,nameRow];
-    for(let i=0;i<maxRows;i++)rows.push(fields.map(f=>f.index<0?'':f.curve.rows[i]?.[f.index]??''));
-    const missing=fields.filter(f=>f.index<0).length;
-    return {headers,rows,dataRowCount:maxRows,warning:missing?`有 ${missing} 列在个别 Curve 中不存在，已用空列保留位置。`:''};
+    const unitRow=fields.map(f=>f.curve.columns[f.index]?.unit??f.col.unit);
+    const commentRow=fields.map(f=>f.curve.kind==='dsc'?f.curve.name:(f.curve.columns[f.index]?.comment??stem(f.curve.fileName)));
+    const rows=[unitRow,commentRow];
+    for(let i=0;i<maxRows;i++)rows.push(fields.map(f=>f.curve.rows[i]?.[f.index]??''));
+    return {headers,rows,dataRowCount:maxRows};
   }
   function getCsvData(){return state.csvMode==='paired'?generatePairedCsv():state.csvMode==='wide'?generateWideCsv():generateLongCsv();}
   function generateResultData(){
-    const curves=selectedCurves();const specs=new Map(),detail=[];
+    const curves=selectedCurves().filter(c=>c.kind==='dsc');const specs=new Map(),detail=[];
     for(const c of curves)for(const g of c.groups){
       if(!g.selected)continue;
       const dupe=new Map();
@@ -337,19 +682,19 @@ button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,inpu
     return {shownCols:maxCols};
   }
   function renderPreviews(){
-    if(!selectedCurves().length||!state.columns.size){
-      tablePreview('csvPreview',[],[],!state.curves.length?'导入文件后可预览曲线数据。':'请至少勾选一条 Curve 和一个数据列。');
+    if(!selectedCurves().length||!selectedColumns().length){
+      tablePreview('csvPreview',[],[],!state.curves.length?'导入文件后可预览实验数据。':'请至少选择一个数据组和一列数据。');
       el('csvPreviewCount').textContent='0 行';el('csvPreviewNote').textContent='';
     }else{
-      const csv=getCsvData();const info=tablePreview('csvPreview',csv.headers,csv.rows,'所选曲线无数值行。');
+      const csv=getCsvData();const info=tablePreview('csvPreview',csv.headers,csv.rows,'所选数据组无有效数据行。');
       el('csvPreviewCount').textContent=state.csvMode==='paired'?`${intFormat(csv.dataRowCount||0)} 行数据 + 3 行表头`:`${intFormat(csv.rows.length)} 行`;
       el('csvPreviewNote').textContent=`共 ${intFormat(csv.headers.length)} 列，预览前 ${info.shownCols} 列；导出含全部列。${csv.warning||''}`;
     }
     const res=generateResultData();
     if(!res.specs.length){tablePreview('resultPreview',[],[],state.curves.length?'所选曲线与指标没有可用的 Results。':'导入带 Results 的文件后可预览。');el('resultPreviewCount').textContent='0 指标';el('resultPreviewNote').textContent='';}
     else{const info=tablePreview('resultPreview',res.headers,res.rows,'暂无结果');el('resultPreviewCount').textContent=`${res.specs.length} 指标列`;el('resultPreviewNote').textContent=`汇总 ${res.rows.length} 条 Curve，明细 ${res.detailRows.length} 条；共 ${res.headers.length} 列，预览前 ${info.shownCols} 列。`;}
-    const disabledCsv=!selectedCurves().length||!state.columns.size;
-    el('downloadCsv').disabled=disabledCsv;el('downloadZip').disabled=disabledCsv;
+    const disabledCsv=!selectedCurves().length||!selectedColumns().length;
+    el('downloadCsv').disabled=disabledCsv;el('downloadZip').disabled=disabledCsv;el('downloadDataExcel').disabled=disabledCsv;
     el('downloadExcel').disabled=!res.detailRows.length;
   }
   function renderAll(){renderStats();renderFiles();renderCurves();renderColumns();renderMetrics();renderPreviews();}
@@ -366,10 +711,22 @@ button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,inpu
   }
   function stamp(){const d=new Date();const pad=n=>String(n).padStart(2,'0');return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}`;}
   function downloadCombinedCsv(){
-    if(!selectedCurves().length||!state.columns.size)return toast('请先选择 Curve 与数据列',true);
+    if(!selectedCurves().length||!selectedColumns().length)return toast('请先选择 Curve 与数据列',true);
     const csv=getCsvData();if(!csv.rows.length)return toast('没有可导出的数值数据',true);
-    triggerDownload('\ufeff'+csvText(csv.headers,csv.rows,state.delimiter),`DSC_Curves_${state.csvMode}_${stamp()}.csv`,'text/csv;charset=utf-8');
+    triggerDownload('\ufeff'+csvText(csv.headers,csv.rows,state.delimiter),`Lab_Data_${state.csvMode}_${stamp()}.csv`,'text/csv;charset=utf-8');
     toast(state.csvMode==='paired'?`已生成截图格式 CSV：${intFormat(csv.dataRowCount||0)} 行数据 + 3 行表头，${csv.headers.length} 列`:`已生成合并 CSV：${intFormat(csv.rows.length)} 行 × ${csv.headers.length} 列`);
+  }
+  function downloadDataExcel(){
+    if(!selectedCurves().length||!selectedColumns().length)return toast('请先选择数据组与数据列',true);
+    const data=getCsvData();if(!data.headers.length||!data.rows.length)return toast('没有可导出的数据',true);
+    const rows=data.rows.map((row,i)=>row.map((v,j)=>{
+      if(state.csvMode==='paired'&&i<2)return v; // units + comments stay as text
+      if(state.csvMode==='long'&&j<3)return v; // source / name / row index
+      const st=String(v??'').trim();return st&&numericRx.test(st)&&Number.isFinite(Number(st))?Number(st):v;
+    }));
+    const book=makeWorkbook([{name:'数据合并',header:data.headers,rows,headerRows:state.csvMode==='paired'?3:1}]);
+    triggerDownload(book,`Lab_Data_${state.csvMode}_${stamp()}.xlsx`,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    toast(`已生成 Excel：${data.headers.length} 列 × ${rows.length+1} 行`);
   }
   function oneCurveCsv(c){
     if(state.csvMode==='paired'){
@@ -409,27 +766,28 @@ button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,inpu
       const base=safeFileName(c.name),count=(names.get(base)||0)+1;names.set(base,count);
       return [`Curve_${String(i+1).padStart(2,'0')}_${base}${count>1?'_'+count:''}.csv`, '\ufeff'+oneCurveCsv(c)];
     });
-    triggerDownload(makeZip(output),`DSC_Curves_split_${stamp()}.zip`,'application/zip');
+    triggerDownload(makeZip(output),`Lab_Split_${stamp()}.zip`,'application/zip');
     toast(`已生成 ZIP：${output.length} 个独立 Curve CSV`);
   }
   // Minimal Office Open XML workbook builder, without external libraries/CDNs.
   const xmlEsc=v=>String(v??'').replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g,'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
   function excelCol(n){let s='';for(let t=n;t>0;t=Math.floor((t-1)/26))s=String.fromCharCode(65+(t-1)%26)+s;return s;}
-  function sheetXML(table){
+  function sheetXML(table,headerRows=1){
     if(table.length>1048576)throw new Error('Excel 单工作表行数超出上限');
     if(table.some(r=>r.length>16384))throw new Error('Excel 单工作表列数超出上限');
-    const dimCols=Math.max(1,...table.map(row=>row.length)),dimRows=Math.max(1,table.length);
+    const dimCols=table.reduce((m,row)=>Math.max(m,row.length),1),dimRows=Math.max(1,table.length);
     const dimension=`A1:${excelCol(dimCols)}${dimRows}`;
     const rows=table.map((row,i)=>{
       const cells=row.map((v,j)=>{
         if(v===null||v===undefined||v==='')return '';
-        const pos=`${excelCol(j+1)}${i+1}`,style=i===0?' s="1"':'';
+        const pos=`${excelCol(j+1)}${i+1}`,style=headerRows===3&&i<3?` s="${i+2}"`:(i===0?' s="1"':'');
         if(typeof v==='number'&&Number.isFinite(v))return `<c r="${pos}"${style}><v>${v}</v></c>`;
         return `<c r="${pos}"${style} t="inlineStr"><is><t xml:space="preserve">${xmlEsc(v)}</t></is></c>`;
       }).join('');
-      return `<row r="${i+1}">${cells}</row>`;
+      const height=headerRows===3&&i<3?[45,24,28][i]:(i===0?32:0);
+      return `<row r="${i+1}"${height?` ht="${height}" customHeight="1"`:''}>${cells}</row>`;
     }).join('');
-    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><dimension ref="${dimension}"/><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="16"/><cols><col min="1" max="1" width="28" customWidth="1"/><col min="2" max="2" width="27" customWidth="1"/><col min="3" max="3" width="25" customWidth="1"/><col min="4" max="16384" width="20" customWidth="1"/></cols><sheetData>${rows}</sheetData><autoFilter ref="${dimension}"/></worksheet>`;
+    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><dimension ref="${dimension}"/><sheetViews><sheetView workbookViewId="0"><pane ySplit="${headerRows}" topLeftCell="A${headerRows+1}" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><sheetFormatPr defaultRowHeight="16"/><cols><col min="1" max="1" width="28" customWidth="1"/><col min="2" max="2" width="27" customWidth="1"/><col min="3" max="3" width="25" customWidth="1"/><col min="4" max="16384" width="20" customWidth="1"/></cols><sheetData>${rows}</sheetData>${headerRows===3?'':`<autoFilter ref="${dimension}"/>`}</worksheet>`;
   }
   function makeWorkbook(sheets){
     const names=sheets.map(s=>s.name);
@@ -437,8 +795,8 @@ button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,inpu
     const rootRels=`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`;
     const workbook=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><bookViews><workbookView/></bookViews><sheets>${names.map((n,i)=>`<sheet name="${xmlEsc(n)}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join('')}</sheets></workbook>`;
     const workbookRels=`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${names.map((_,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join('')}<Relationship Id="rId${names.length+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`;
-    const styles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF27447F"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
-    return makeZip([['[Content_Types].xml',contentType],['_rels/.rels',rootRels],['xl/workbook.xml',workbook],['xl/_rels/workbook.xml.rels',workbookRels],['xl/styles.xml',styles],...sheets.map((s,i)=>[`xl/worksheets/sheet${i+1}.xml`,sheetXML([s.header,...s.rows])])]);
+    const styles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="3"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FF283D60"/><name val="Calibri"/></font></fonts><fills count="6"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF27447F"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFEAF0FF"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFF3F6FB"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFF8FAFD"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="5"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment wrapText="1" horizontal="center" vertical="center"/></xf><xf numFmtId="0" fontId="2" fillId="3" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment wrapText="1" horizontal="center" vertical="center"/></xf><xf numFmtId="0" fontId="2" fillId="4" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment wrapText="1" horizontal="center" vertical="center"/></xf><xf numFmtId="0" fontId="2" fillId="5" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment wrapText="1" horizontal="center" vertical="center"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
+    return makeZip([['[Content_Types].xml',contentType],['_rels/.rels',rootRels],['xl/workbook.xml',workbook],['xl/_rels/workbook.xml.rels',workbookRels],['xl/styles.xml',styles],...sheets.map((s,i)=>[`xl/worksheets/sheet${i+1}.xml`,sheetXML([s.header,...s.rows],s.headerRows||1)])]);
   }
   function downloadResultsExcel(){
     const data=generateResultData();
@@ -452,7 +810,14 @@ button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,inpu
     toast(`已生成 Excel：${data.rows.length} 条 Curve、${data.detailRows.length} 条结果指标`);
   }
   function setEntireSet(key,items,selected){state[key]=new Set(selected?items:[]);if(key==='columns')state.columnTouched=true;else state.metricTouched=true;renderAll();}
-  async function reparseAll(){for(const f of state.files){try{const decoded=decodeBytes(f.buffer,el('encoding').value);const parsed=parseDSC(decoded.text,f.id,f.fileName);f.curves=parsed.curves;f.warnings=parsed.warnings;f.encoding=decoded.encoding;}catch(err){toast(`${f.fileName} 编码解析失败：${err.message}`,true);}}state.expanded.clear();recompute();}
+  async function reparseAll(){
+    for(const f of state.files){
+      try{const parsed=await parseAnyFile(f.buffer,f.id,f.fileName,f.mode);
+        f.curves=parsed.curves;f.warnings=parsed.warnings;f.encoding=parsed.encoding;f.kind=parsed.kind;
+      }catch(err){f.curves=[];f.warnings=[err.message];toast(`${f.fileName} 解析失败：${err.message}`,true);}
+    }
+    state.expanded.clear();recompute();
+  }
   // Event listeners
   el('fileInput').addEventListener('change',async e=>{await addFiles(e.target.files);e.target.value='';});
   el('dropZone').addEventListener('click',()=>el('fileInput').click());
@@ -460,8 +825,8 @@ button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,inpu
   for(const eventName of ['dragenter','dragover'])el('dropZone').addEventListener(eventName,e=>{e.preventDefault();el('dropZone').classList.add('dragover');});
   for(const eventName of ['dragleave','drop'])el('dropZone').addEventListener(eventName,e=>{e.preventDefault();el('dropZone').classList.remove('dragover');});
   el('dropZone').addEventListener('drop',async e=>{await addFiles(e.dataTransfer.files);});
-  el('encoding').addEventListener('change',()=>{if(state.files.length){reparseAll();toast('已按新编码重新解析全部文件');}});
-  el('clearFiles').addEventListener('click',()=>{state.files=[];state.expanded.clear();state.columnTouched=false;state.metricTouched=false;state.columns.clear();state.metrics.clear();recompute();toast('已清空已导入文件');});
+  el('encoding').addEventListener('change',()=>{if(state.files.length){reparseAll();toast('已按新编码重新解析文本文件');}});
+  el('clearFiles').addEventListener('click',()=>{state.files=[];state.expanded.clear();state.columnTouched=false;state.metricTouched=false;state.columns.clear();state.columnOrder=[];state.metrics.clear();recompute();toast('已清空已导入文件');});
   el('selectAllCurves').addEventListener('click',()=>{state.curves.forEach(c=>c.selected=true);renderAll();});
   el('selectNoCurves').addEventListener('click',()=>{state.curves.forEach(c=>c.selected=false);renderAll();});
   el('curveSearch').addEventListener('input',e=>{state.search=e.target.value;renderCurves();});
@@ -473,30 +838,40 @@ button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,inpu
     if(!e.target.checked)return;
     state.csvMode=e.target.value;
     el('wideKeyWrap').style.display=state.csvMode==='wide'?'flex':'none';
-    el('csvModeHint').textContent=state.csvMode==='paired'?'第 1 行列名，第 2 行单位，第 3 行 Curve Name；第 4 行开始按原始行序并排。各曲线行数不同时，末尾不足的格子留空，不做插值或强制温度对齐。':state.csvMode==='wide'?'横向合并按数值键精确匹配；不同采样起点或不相同的时间值会留空，不做插值。':'纵向布局不会强行匹配不同 Curve 的时间点；原始数据行按所选曲线顺序保留。';
+    el('csvModeHint').textContent=state.csvMode==='paired'?'第 1 行：名称；第 2 行：单位；第 3 行：注释（DSC 为 Curve Name，流变为文件名，通用保留原注释）；第 4 行起为数据。每个文件占连续多列，不做插值。':state.csvMode==='wide'?'横向合并按数值键精确匹配；不同采样起点或不相同的时间值会留空，不做插值。':'纵向布局不会强行匹配不同 Curve 的时间点；原始数据行按所选曲线顺序保留。';
     renderPreviews();
   }));
   el('wideKey').addEventListener('change',e=>{state.wideKey=e.target.value;renderPreviews();});
   el('csvDelimiter').addEventListener('change',e=>{state.delimiter=e.target.value==='tab'?'\t':e.target.value;renderPreviews();});
   el('downloadCsv').addEventListener('click',()=>{try{downloadCombinedCsv();}catch(e){toast('CSV 导出失败：'+e.message,true);}});
+  el('downloadDataExcel').addEventListener('click',()=>{try{downloadDataExcel();}catch(e){toast('Excel 导出失败：'+e.message,true);}});
   el('downloadZip').addEventListener('click',()=>{try{downloadSplitZip();}catch(e){toast('ZIP 导出失败：'+e.message,true);}});
   el('downloadExcel').addEventListener('click',()=>{try{downloadResultsExcel();}catch(e){toast('Excel 导出失败：'+e.message,true);}});
   el('includeEmptyResults').addEventListener('change',e=>{state.includeEmptyResults=e.target.checked;renderPreviews();});
-  document.addEventListener('change',e=>{
+  document.addEventListener('change',async e=>{
     const target=e.target;const action=target.dataset.action,key=target.dataset.key,id=target.dataset.id;
     if(action==='select-curve'){const c=state.curves.find(x=>x.id===id);if(c)c.selected=target.checked;renderStats();renderPreviews();}
     else if(action==='select-group'){const g=state.curves.flatMap(c=>c.groups).find(x=>x.id===id);if(g)g.selected=target.checked;renderPreviews();}
-    else if(action==='select-column'){state.columnTouched=true;if(target.checked)state.columns.add(key);else state.columns.delete(key);renderPreviews();}
+    else if(action==='select-column'){state.columnTouched=true;if(target.checked)state.columns.add(key);else state.columns.delete(key);renderColumns();renderPreviews();}
     else if(action==='select-metric'){state.metricTouched=true;if(target.checked)state.metrics.add(key);else state.metrics.delete(key);renderPreviews();}
+    else if(action==='file-mode'){const f=state.files.find(x=>String(x.id)===id);if(f){f.mode=target.value;await reparseAll();}}
   });
   document.addEventListener('click',e=>{
     const target=e.target.closest('[data-action]');if(!target||target.matches('input'))return;
     const action=target.dataset.action,id=target.dataset.id;
     if(action==='remove-file'){state.files=state.files.filter(x=>String(x.id)!==id);state.expanded.clear();recompute();}
     else if(action==='expand'){if(state.expanded.has(id))state.expanded.delete(id);else state.expanded.add(id);renderCurves();}
-    else if(action==='single-csv'){const c=state.curves.find(x=>x.id===id);if(!c||!state.columns.size)return toast('请先选择数据列',true);const text='\ufeff'+oneCurveCsv(c);triggerDownload(text,`DSC_${safeFileName(c.name)}.csv`,'text/csv;charset=utf-8');toast(`已导出 ${c.name} 的 ${c.rows.length} 行数据`);}
+    else if(action==='col-up'||action==='col-down'){const at=state.columnOrder.indexOf(target.dataset.key);moveColumn(target.dataset.key,at+(action==='col-up'?-1:1));}
+    else if(action==='single-csv'){const c=state.curves.find(x=>x.id===id);if(!c||!state.columns.size)return toast('请先选择数据列',true);const text='\ufeff'+oneCurveCsv(c);triggerDownload(text,`Lab_${safeFileName(c.name)}.csv`,'text/csv;charset=utf-8');toast(`已导出 ${c.name} 的 ${c.rows.length} 行数据`);}
   });
+  let dragKey=null;
+  el('columnOptions').addEventListener('dragstart',e=>{const item=e.target.closest('[data-drag-key]');if(!item)return;dragKey=item.dataset.dragKey;item.classList.add('dragging');if(e.dataTransfer)e.dataTransfer.effectAllowed='move';});
+  el('columnOptions').addEventListener('dragover',e=>{const item=e.target.closest('[data-drag-key]');if(!dragKey||!item)return;e.preventDefault();item.classList.add('over');});
+  el('columnOptions').addEventListener('dragleave',e=>{e.target.closest('[data-drag-key]')?.classList.remove('over');});
+  el('columnOptions').addEventListener('drop',e=>{const item=e.target.closest('[data-drag-key]');if(!dragKey||!item)return;e.preventDefault();moveColumn(dragKey,state.columnOrder.indexOf(item.dataset.dragKey));dragKey=null;});
+  el('columnOptions').addEventListener('dragend',()=>{dragKey=null;el('columnOptions').querySelectorAll('.field-item').forEach(x=>x.classList.remove('dragging','over'));});
   renderAll();
+  Object.defineProperty(window,'LabDiagnostics',{value:Object.freeze({parseAnyFile,readXls,readXlsx,packRheologyA1,generatePairedCsv,getCsvData,makeWorkbook,get snapshots(){return state.curves.map(c=>({file:c.fileName,kind:c.kind,name:c.name,rows:c.rows.length,columns:c.columns.map(k=>({name:k.name,unit:k.unit,comment:k.comment})),first:c.rows[0]?.slice(0,12)}));},get counts(){return {files:state.files.length,dataGroups:state.curves.length,rows:state.curves.reduce((n,c)=>n+c.rows.length,0)};},addFiles})});
   // Expose read-only diagnostics for local automated test in headless browsers.
   Object.defineProperty(window,'DSCDiagnostics',{value:Object.freeze({get counts(){return {files:state.files.length,curves:state.curves.length,rows:state.curves.reduce((n,c)=>n+c.rows.length,0),groups:state.curves.reduce((n,c)=>n+c.groups.length,0)};},get curves(){return state.curves.map(c=>({name:c.name,columns:c.columns.map(k=>k.display),rows:c.rows.length,groups:c.groups.map(g=>({type:g.type,ordinal:g.ordinal,metrics:g.metrics.length}))}));}}),writable:false});
 })();
